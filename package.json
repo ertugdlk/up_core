@@ -11,7 +11,8 @@
   "dependencies": {
     "config": "^3.3.2",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "mongoose": "^5.10.9"
   },
   "devDependencies": {
     "axios": "^0.20.0"
