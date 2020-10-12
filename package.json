@@ -1,0 +1,19 @@
+{
+  "name": "up_core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^3.3.2",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20"
+  },
+  "devDependencies": {
+    "axios": "^0.20.0"
+  }
+}
