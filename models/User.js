@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
+const Mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Validator = require('validator')
 
-const userModel = mongoose.Schema({
+const userModel = new Mongoose.Schema({
     nickname: {
         type: String,
         required: true,
@@ -12,15 +12,18 @@ const userModel = mongoose.Schema({
     name: {
         type: String,
         required: true,
+        trim: true
     },
     surname: {
         type: String,
         required: true,
+        trim: true
     },
     email: {
         type: String,
         required: true,
         unique: true,
+        lowercase: true,
         validate: value => {
             if (!Validator.isEmail(value)) {
                 throw new Error({error: 'Invalid Email address'})
@@ -32,18 +35,15 @@ const userModel = mongoose.Schema({
         required: true,
         minLength: 6
     },
-    /*
-    phone: {
-        type: String,
-        validate: {
-                validator: function(v) {
-                    return /\d{3}-\d{3}-\d{4}/.test(v)
-                },
-                message: props => `${props.value} is not a valid phone number!`
-            },
-            required: [true, 'User phone number required']
-    },*/
 })
 
-const User = mongoose.model('User', userModel)
-module.exports = User
+userModel.pre('save', async function (next) {
+    // Hash the password before saving the user model
+    const user = this
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 8)
+    }
+    next()
+})
+
+module.exports = Mongoose.model('User', userModel)

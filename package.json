@@ -2,13 +2,14 @@
   "name": "up_core",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "config": "^3.3.2",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
