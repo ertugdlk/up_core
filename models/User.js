@@ -46,4 +46,17 @@ userModel.pre('save', async function (next) {
     next()
 })
 
+userModel.methods.findByCredentials = async function()
+{
+    const isPasswordMatch = bcrypt.compareSync(password , this.password)
+    if(!isPasswordMatch)
+    {
+        throw new error ({error:'Invalid'})
+    }
+    else
+    {
+        return true
+    }
+}
+
 module.exports = Mongoose.model('User', userModel)
