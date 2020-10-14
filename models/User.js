@@ -46,9 +46,8 @@ userModel.pre('save', async function (next) {
     next()
 })
 
-userModel.methods.findByCredentials = async function()
+userModel.methods.findByCredentials = async function(password)
 {
-    const user = this
     const isPasswordMatch = bcrypt.compare(password , this.password)
     if(!isPasswordMatch)
     {
