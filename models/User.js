@@ -48,7 +48,8 @@ userModel.pre('save', async function (next) {
 
 userModel.methods.findByCredentials = async function()
 {
-    const isPasswordMatch = bcrypt.compareSync(password , this.password)
+    const user = this
+    const isPasswordMatch = bcrypt.compare(password , this.password)
     if(!isPasswordMatch)
     {
         throw new error ({error:'Invalid'})
