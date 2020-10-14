@@ -46,6 +46,13 @@ userModel.pre('save', async function (next) {
     next()
 })
 
+userModel.methods.generateAuthToken = async function() {
+    // Generate an auth token for the user
+    const token = jwt.sign({_id: this._id},
+        'cukubik')
+    return token
+}
+
 userModel.methods.findByCredentials = async function(password)
 {
     const isPasswordMatch = bcrypt.compare(password , this.password)
