@@ -49,7 +49,11 @@ userModel.pre('save', async function (next) {
 userModel.methods.generateAuthToken = async function() {
     // Generate an auth token for the user
     const token = jwt.sign({_id: this._id},
-        'cukubik')
+        'cukubik',
+        {
+            expiresIn:"10h"
+        }
+        )
     return token
 }
 
