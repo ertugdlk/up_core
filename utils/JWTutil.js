@@ -34,4 +34,4 @@ class JWTutil
     }   
 }
 
-module.exports = JWTutil
+module.exports = new JWTutil()
