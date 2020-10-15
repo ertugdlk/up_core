@@ -5,9 +5,8 @@ const userData = { nickname: 'phybarin', name: 'Ertuğ', surname:'Dilek', email:
 const bcrypt = require('bcrypt')
 
 describe('User Model Test', () => {
-
-    // It's just so easy to connect to the MongoDB Memory Server 
-    // By using mongoose.connect
+    //connect to the mongoDB memory server 
+    //using mongoose.connect
     beforeAll(async () => {
         await mongoose.connect(global.__MONGO_URI__, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
             if (err) {
@@ -26,4 +25,30 @@ describe('User Model Test', () => {
         expect(savedUser.surname).toBe(userData.surname)
         expect(savedUser.email).toBe(userData.email)
     });
+
+    it('insert user successfully, undefined fields should be undefined', async () => {
+        const userWithInvalidField = new UserModel({ nickname: 'kaygan', name: 'Ozan', surname:'Ezer', email: 'ozanezer@gmail.com',
+        password:'123456', gender:'male'})
+        const savedUserWithInvalidField = await userWithInvalidField.save()
+        expect(savedUserWithInvalidField._id).toBeDefined()
+        expect(savedUserWithInvalidField.gender).toBeUndefined()
+    })
+
+    it('insert user without required field should be error', async() => {
+        const userWithoutRequiredField = new UserModel({name:'Erce', surname:'Bektüre', email:'ercebekture@gmail.com', password:'123456' })
+        let err
+
+        try
+        {
+            const savedUser = await userWithoutRequiredField.save()
+            error = savedUser
+        }
+        catch(error)
+        {
+            err = error
+        }
+
+        expect(err).toBeInstanceOf(mongoose.Error.ValidationError)
+        expect(err.errors.nickname).toBeDefined()
+    })
 })
