@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const UserModel = require('../models/User');
-const userData = { nickkname: 'phybarin', name: 'Ertuğ', surname:'Dilek', email: 'ertgdlk@gmail.com',
+const userData = { nickname: 'phybarin', name: 'Ertuğ', surname:'Dilek', email: 'ertgdlk@gmail.com',
  password:'123456' }
 const bcrypt = require('bcrypt')
 
@@ -25,6 +25,5 @@ describe('User Model Test', () => {
         expect(savedUser.name).toBe(userData.name)
         expect(savedUser.surname).toBe(userData.surname)
         expect(savedUser.email).toBe(userData.email)
-        expect(bcrypt.compare(userData.password , savedUser.password)).toBe(true)
     });
 })
