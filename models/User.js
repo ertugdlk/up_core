@@ -2,6 +2,8 @@ const Mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Validator = require('validator')
+const Config = require('config')
+const JWTUtil = require('../utils/JWTutil')
 
 const userModel = new Mongoose.Schema({
     nickname: {
@@ -47,14 +49,9 @@ userModel.pre('save', async function (next) {
 })
 
 userModel.methods.generateAuthToken = async function() {
-    // Generate an auth token for the user
-    const token = jwt.sign({_id: this._id},
-        'cukubik',
-        {
-            expiresIn:"10h"
-        }
-        )
-    return token
+    // Generate an auth token for the userId
+    const accessToken = await JWTUtil.sign(this, Config.get('jwt'))
+    return accessToken
 }
 
 userModel.methods.findByCredentials = async function(password)
