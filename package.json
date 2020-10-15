@@ -17,6 +17,8 @@
     "validator": "^13.1.17"
   },
   "devDependencies": {
-    "axios": "^0.20.0"
+    "@shelf/jest-mongodb": "^1.2.3",
+    "axios": "^0.20.0",
+    "jest": "^26.5.3"
   }
 }
