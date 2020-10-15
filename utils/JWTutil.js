@@ -31,7 +31,25 @@ class JWTutil
                     reject(error)
             });
        })
-    }   
+    }  
+    
+    verify(accessToken, jwtOptions)
+    {
+        return new Promise((resolve, reject) => 
+        {
+            JWT.verify(accessToken, jwtOptions.secret, (error,decoded) => 
+            {
+                if(!error)
+                {
+                    resolve(decoded.data.user)
+                }
+                else
+                {
+                    reject(error)
+                }
+            })
+        })
+    }
 }
 
 module.exports = new JWTutil()
