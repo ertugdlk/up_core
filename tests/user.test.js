@@ -51,4 +51,22 @@ describe('User Model Test', () => {
         expect(err).toBeInstanceOf(mongoose.Error.ValidationError)
         expect(err.errors.nickname).toBeDefined()
     })
+
+    it('When user created user password decryption works or not', async() => {
+        const user = await new UserModel({nickname:'berkanny', name:'Berkan', surname:'Yuksel', email:'berkanyuksel@gmail.com', password:'123456'})
+        const savedUser = await user.save()
+        var boolError
+        const isPasswordMatch = bcrypt.compare(user.password , savedUser.password)
+
+        if(!isPasswordMatch)
+        {
+            boolError = false
+        }
+        else
+        {
+            boolError = true
+        }
+
+        expect(boolError).toBe(true)
+    })
 })
