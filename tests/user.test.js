@@ -1,7 +1,8 @@
-const mongoose = require('mongoose');
-const UserModel = require('../models/User');
+const mongoose = require('mongoose')
+const UserModel = require('../models/User')
+const birthDate = new Date("1998-05-13")
 const userData = { nickname: 'phybarin', name: 'Ertuğ', surname:'Dilek', email: 'ertgdlk@gmail.com',
- password:'123456' }
+ password:'123456', dateOfBirth:  birthDate}
 const bcrypt = require('bcrypt')
 
 describe('User Model Test', () => {
@@ -28,14 +29,14 @@ describe('User Model Test', () => {
 
     it('insert user successfully, undefined fields should be undefined', async () => {
         const userWithInvalidField = new UserModel({ nickname: 'kaygan', name: 'Ozan', surname:'Ezer', email: 'ozanezer@gmail.com',
-        password:'123456', gender:'male'})
+        password:'123456', gender:'male', dateOfBirth: birthDate})
         const savedUserWithInvalidField = await userWithInvalidField.save()
         expect(savedUserWithInvalidField._id).toBeDefined()
         expect(savedUserWithInvalidField.gender).toBeUndefined()
     })
 
     it('insert user without required field should be error', async() => {
-        const userWithoutRequiredField = new UserModel({name:'Erce', surname:'Bektüre', email:'ercebekture@gmail.com', password:'123456' })
+        const userWithoutRequiredField = new UserModel({name:'Erce', surname:'Bektüre', email:'ercebekture@gmail.com', password:'123456', dateOfBirth: birthDate})
         let err
 
         try
@@ -53,7 +54,7 @@ describe('User Model Test', () => {
     })
 
     it('When user created user password decryption works or not', async() => {
-        const user = await new UserModel({nickname:'berkanny', name:'Berkan', surname:'Yuksel', email:'berkanyuksel@gmail.com', password:'123456'})
+        const user = await new UserModel({nickname:'berkanny', name:'Berkan', surname:'Yuksel', email:'berkanyuksel@gmail.com', password:'123456', dateOfBirth: birthDate})
         const savedUser = await user.save()
         var boolError
         const isPasswordMatch = bcrypt.compare(user.password , savedUser.password)
