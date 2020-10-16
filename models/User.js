@@ -37,6 +37,15 @@ const userModel = new Mongoose.Schema({
         required: true,
         minLength: 6
     },
+    dateOfBirth: {
+        type: Date,
+        required: true,
+        trim: true,
+    },
+    country:{
+        type: String,
+        trim: true,
+    }
 })
 
 userModel.pre('save', async function (next) {
