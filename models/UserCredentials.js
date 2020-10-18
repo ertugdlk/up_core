@@ -3,12 +3,13 @@ const Mongoose = require('mongoose')
 const User = require('./User')
 const Schema   = Mongoose.Schema
 const bcrypt = require('bcrypt')
+const {encrypt, decrypt} = require('../utils/Cryptoutil')
 
 const CredentialsSchema = new Mongoose.Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     identityID: {
-        type: String,
-        required: true,
+        iv:{type: String,},
+        content:{type: String,}
     },
     phone: {
         type: String,
@@ -25,7 +26,7 @@ const CredentialsSchema = new Mongoose.Schema({
 CredentialsSchema.pre('save', async function () {
     const credentials = this
     if (credentials.isModified('identityID')) {
-        credentials.identityID = await bcrypt.hash(credentials.identityID, 9)
+        credentials.identityID = await encrypt(credentials.identityID)
     }
     next()
 })
