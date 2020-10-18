@@ -16,7 +16,7 @@ const CredentialsSchema = new Mongoose.Schema({
         required: [true, 'User phone number required']
     }
 })
-
+/*
 CredentialsSchema.pre('save', async function (next) {
     const credentials = this
     if (credentials.isModified('identityID')) {
@@ -24,5 +24,6 @@ CredentialsSchema.pre('save', async function (next) {
     }
     next()
 })
+*/
 
 module.exports = Mongoose.model('Credential', CredentialsSchema)
