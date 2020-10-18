@@ -1,7 +1,8 @@
-const crypto = require('crypto');
+const crypto = require('crypto')
 
-const algorithm = 'aes-256-ctr';
-const secretKey = 'qHYW3TZn3bgdBcA9QVZ';
+const algorithm = 'aes-256-ctr'
+const secretKey = new Buffer('qHYW3TZn3bgdBcA9c7rdxs01lwHzfr3z', 'utf8')
+
 const iv = crypto.randomBytes(16);
 
 const encrypt = (text) => {
