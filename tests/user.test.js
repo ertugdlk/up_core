@@ -70,4 +70,5 @@ describe('User Model Test', () => {
 
         expect(boolError).toBe(true)
     })
+    
 })
