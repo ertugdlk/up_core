@@ -16,14 +16,5 @@ const CredentialsSchema = new Mongoose.Schema({
         required: [true, 'User phone number required']
     }
 })
-/*
-CredentialsSchema.pre('save', async function (next) {
-    const credentials = this
-    if (credentials.isModified('identityID')) {
-        credentials.identityID = await encrypt(credentials.identityID)
-    }
-    next()
-})
-*/
 
 module.exports = Mongoose.model('Credential', CredentialsSchema)
