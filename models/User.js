@@ -11,16 +11,6 @@ const userModel = new Mongoose.Schema({
         required: true,
         unique: true,
     },
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    surname: {
-        type: String,
-        required: true,
-        trim: true
-    },
     email: {
         type: String,
         required: true,
@@ -42,10 +32,6 @@ const userModel = new Mongoose.Schema({
         required: true,
         trim: true,
     },
-    country:{
-        type: String,
-        trim: true,
-    }
 })
 
 userModel.pre('save', async function (next) {
