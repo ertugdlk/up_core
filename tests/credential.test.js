@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 const CredentialModel = require('../models/UserCredentials')
 const UserModel = require('../models/User')
-const birthDate = new Date("1998-05-13")
-const userData = { nickname: 'bluffist', name: 'Aral', surname:'Karaoğlan', email: 'aralkaraoglan@gmail.com',
- password:'123456', dateOfBirth:  birthDate}
+const date = new Date()
+date.setFullYear(1998,4,13)
+const userData = { nickname: 'bluffist', email: 'aralkaraoglan@gmail.com', password:'123456', dateOfBirth:  date}
 const {encrypt , decrypt} = require('../utils/Cryptoutil')
 
 describe('Credential Model Test', () => {
@@ -22,7 +22,7 @@ describe('Credential Model Test', () => {
         const validUser = new UserModel(userData)
         const savedUser = await validUser.save()
 
-        const credentialData = {user: savedUser._id, identityID: "12345678910", phone: "5313809485"}
+        const credentialData = {user: savedUser._id, identityID: "12345678910", phone: "5313809485",  name: 'Aral', surname:'Karaoğlan'}
         credentialData.identityID = await encrypt(credentialData.identityID)
         const credential = new CredentialModel(credentialData)
         const savedCredential = await credential.save()
