@@ -32,6 +32,10 @@ const userModel = new Mongoose.Schema({
         required: true,
         trim: true,
     },
+    isVerified: {
+        type: Boolean,
+        default: false
+    }
 })
 
 userModel.pre('save', async function (next) {
