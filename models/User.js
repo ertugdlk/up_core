@@ -49,6 +49,7 @@ userModel.pre('save', async function (next) {
 
 userModel.methods.generateAuthToken = async function() {
     // Generate an auth token for the userId
+    this.password = ''
     const accessToken = await JWTUtil.sign(this, Config.get('jwt'))
     return accessToken
 }
