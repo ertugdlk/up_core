@@ -4,7 +4,7 @@ const defaultConfig =
 {
     "jwt":
 	{
-		"secret": "cukubik",
+		"secret": "Rst.!bJTQEdf79",
         "expiresIn": "7 days",
         "is": 
         {
