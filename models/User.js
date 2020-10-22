@@ -27,11 +27,6 @@ const userModel = new Mongoose.Schema({
         required: true,
         minLength: 6
     },
-    dateOfBirth: {
-        type: Date,
-        required: true,
-        trim: true,
-    },
     isVerified: {
         type: Boolean,
         default: false

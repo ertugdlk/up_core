@@ -24,6 +24,11 @@ const CredentialsSchema = new Mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    dateOfBirth: {
+        type: Date,
+        required: true,
+        trim: true,
     }
 })
 
