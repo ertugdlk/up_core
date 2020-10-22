@@ -10,6 +10,7 @@ const userModel = new Mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+        minlength:4
     },
     email: {
         type: String,

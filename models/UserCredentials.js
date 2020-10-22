@@ -13,7 +13,8 @@ const CredentialsSchema = new Mongoose.Schema({
     },
     phone: {
         type: String,
-        required: [true, 'User phone number required']
+        required: [true, 'User phone number required'],
+        unique: true
     },
     name: {
         type: String,
