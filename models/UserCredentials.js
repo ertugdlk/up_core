@@ -33,4 +33,8 @@ const CredentialsSchema = new Mongoose.Schema({
     }
 })
 
+CredentialsSchema.post('save', async function(){
+    await User.findOneAndUpdate({_id : this.user}, {isVerified : true})
+})
+
 module.exports = Mongoose.model('Credential', CredentialsSchema)

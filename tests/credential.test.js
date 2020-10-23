@@ -35,8 +35,18 @@ describe('Credential Model Test', () => {
         expect(savedCredential.phone).toBe(credentialData.phone)
     })
 
-    it('Get user credential from correct from access token with decrpyted identityID', async() => {
-        
-    })
+    it('When credential created user must be verified', async() => {
+        const validUser = new UserModel({ nickname: 'mrboken', email: 'mrbroken@gmail.com', password:'123456'})
+        const savedUser = await validUser.save()
+
+        const credentialData = {user: savedUser._id, identityID: "12345678910", phone: "5313809486",  name: 'Erce', surname:'Danimarka',dateOfBirth:  date}
+        credentialData.identityID = await encrypt(credentialData.identityID)
+        const credential = new CredentialModel(credentialData)
+        const savedCredential = await credential.save()
+        const finduser = await UserModel.findOne({_id : savedUser._id})
    
+        expect(finduser.isVerified).toBe(true)
+
+    })
+    
 })    
