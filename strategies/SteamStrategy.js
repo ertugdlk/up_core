@@ -17,3 +17,5 @@ const SteamStrategy = new OpenIDStrategy({
             return done(user,null)
         })
     })
+
+module.exports = SteamStrategy    
