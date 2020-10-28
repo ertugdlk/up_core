@@ -1,5 +1,6 @@
 const Mongoose = require('mongoose')
 const _ = require('lodash')
+const Schema   = Mongoose.Schema
 
 const DetailSchema = new Mongoose.Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
