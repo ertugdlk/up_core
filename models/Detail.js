@@ -6,7 +6,7 @@ const DetailSchema = Mongoose.Schema({
     platform: { type: Schema.Types.ObjectId, ref: 'Platform' },
     name: {
         type:String,
-        required: true
+        trim:true
     },
     uniqueID: { 
         type: String,

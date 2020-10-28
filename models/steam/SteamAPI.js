@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const Axios = require('axios')
+const Config = require('config')
 
 class SteamAPI 
 {
@@ -7,7 +8,7 @@ class SteamAPI
     {
         try
         {
-            const apiKey = ""
+            const apiKey = Config.get('platforms.steam.apiKey')
             const url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key='+ apiKey +'&steamids=' + steamID
             const response = await Axios.get(url)
 
