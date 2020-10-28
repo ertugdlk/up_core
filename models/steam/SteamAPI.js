@@ -19,6 +19,7 @@ class SteamAPI
             throw error
         }
     }
+
 }
 
 module.exports = new SteamAPI()
