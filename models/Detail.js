@@ -12,7 +12,8 @@ const DetailSchema = new Mongoose.Schema({
     uniqueID: { 
         type: String,
         required: true
-    }
+    },
+    games: [Schema.Types.ObjectId]
 }, {versionKey: false})
 
 module.exports = Mongoose.model('Detail' , DetailSchema)

@@ -2,6 +2,8 @@ const _ = require('lodash')
 const Axios = require('axios')
 
 const DetailBuilder = require('../builders/DetailBuilder')
+const Detail = require('../Detail')
+const Game = require('../Game')
 const SteamAPI = require('./SteamAPI')
 
 class SteamUserDetail
@@ -19,6 +21,38 @@ class SteamUserDetail
             const SteamUserDetail = new SteamUserDetail(response)
 
             return SteamUserDetail
+        }
+        catch(error)
+        {
+            throw error
+        }
+    }
+
+    static async matchGames({steamID, user, platform})
+    {
+        try
+        {
+            const response = await SteamAPI.getOwnedGames({steamID})
+            const SteamGames = await Game.find({platform})
+            const UserDetail = await Detail.findOne({ platform: platform , user: user})
+
+            const data = _.chain(SteamGames).map( game => {
+                try
+                {
+                    const MatchedGame = _.chain(response).find({'appid': game })
+                    if(MatchedGames)
+                    {
+                        UserDetail.games.push(game)
+                    }
+                }
+                catch(error)
+                {
+                    throw error
+                }
+            })
+
+            return UserDetail
+
         }
         catch(error)
         {

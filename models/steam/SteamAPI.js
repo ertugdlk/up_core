@@ -1,14 +1,15 @@
 const _ = require('lodash')
 const Axios = require('axios')
 const Config = require('config')
+const apiKey = Config.get('platforms.steam.apiKey')
+
 
 class SteamAPI 
 {
-    async getDetail({steamID })
+    async getDetail({steamID})
     {
         try
         {
-            const apiKey = Config.get('platforms.steam.apiKey')
             const url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key='+ apiKey +'&steamids=' + steamID
             const response = await Axios.get(url)
 
@@ -17,6 +18,21 @@ class SteamAPI
         catch(error)
         {
             throw error
+        }
+    }
+
+    async getOwnedGames({steamID})
+    {
+        try
+        {
+            const url = 'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key='+ apiKey +'&steamid='+ steamID +'&format=json'
+            const response = await Axios.get(url)
+
+            return _.get(response, 'games')
+        }
+        catch
+        {
+            
         }
     }
 
