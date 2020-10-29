@@ -40,7 +40,7 @@ class SteamUserDetail
                 try
                 {
                     const MatchedGame = _.chain(response).find({'appid': game })
-                    if(MatchedGames)
+                    if(MatchedGame)
                     {
                         UserDetail.games.push(game)
                     }
