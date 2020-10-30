@@ -65,7 +65,7 @@ class SteamUserDetail
         const platform = '5f9a84fca1f0c0b83de7d696'
 
         const builder = new DetailBuilder()
-                        .name(_.get(this , 'personname'))
+                        .name(_.get(this , 'personaname'))
                         .uniqueID( _.get(this, 'steamid'))
                         .platform( platform )
                         .user( user )
