@@ -13,11 +13,11 @@ class SteamUserDetail
         Object.assign(this, detail)
     }
 
-    static async find({ steamID }) 
+    async find({}) 
     {
         try
         {
-            const response = await SteamAPI.getDetail({steamID})
+            const response = await SteamAPI.getDetail({steamID : this.steamID})
             const SteamUserDetail = new SteamUserDetail(response)
 
             return SteamUserDetail
