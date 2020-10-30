@@ -34,24 +34,17 @@ class SteamUserDetail
             const platform = '5f9a84fca1f0c0b83de7d696'
             const response = await SteamAPI.getOwnedGames({steamID})
             const SteamGames = await Game.find({platform: platform})
-            const UserDetail = await Detail.findOne({ platform: platform , user: user})
+            const detail = await Detail.findOne({ platform: platform , user: user})
 
             _.chain(SteamGames).map( game => {
-                try
-                {
                     const MatchedGame = _.chain(response).find({'appid': game.appID })
                     if(MatchedGame)
                     {
-                        UserDetail.games.push(game._id)
+                        detail.games.push(game._id)
                     }
-                }
-                catch(error)
-                {
-                    throw error
-                }
             })
 
-            return UserDetail
+            return detail
 
         }
         catch(error)
