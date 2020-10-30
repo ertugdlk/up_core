@@ -36,12 +36,14 @@ class SteamUserDetail
             const SteamGames = await Game.find({platform: platform})
             const detail = await Detail.findOne({ platform: platform , user: user})
 
-            _.chain(SteamGames).map( game => {
+            SteamGames.map( game => {
                     const MatchedGame = _.find(response, {'appid':  game.appID})
                     if(MatchedGame)
                     {
                         detail.games.push(game._id)
                     }
+
+
             })
 
             return detail
