@@ -39,10 +39,10 @@ class SteamUserDetail
             _.chain(SteamGames).map( game => {
                 try
                 {
-                    const MatchedGame = _.chain(response).find({'appid': game })
+                    const MatchedGame = _.chain(response).find({'appid': game.appID })
                     if(MatchedGame)
                     {
-                        UserDetail.games.push(game)
+                        UserDetail.games.push(game._id)
                     }
                 }
                 catch(error)
