@@ -28,7 +28,7 @@ class SteamAPI
             const url = 'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key='+ apiKey  +'&steamid='+ steamID +'&format=json'
             const response = await Axios.get(url)
 
-            return _.get(response, 'games')
+            return _.get(response, 'data.response.games')
         }
         catch
         {
