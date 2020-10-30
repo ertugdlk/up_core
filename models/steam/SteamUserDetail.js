@@ -13,7 +13,7 @@ class SteamUserDetail
         Object.assign(this, detail)
     }
 
-    async find({steamID}) 
+    static async find({steamID}) 
     {
         try
         {
