@@ -37,7 +37,7 @@ class SteamUserDetail
             const detail = await Detail.findOne({ platform: platform , user: user})
 
             _.chain(SteamGames).map( game => {
-                    const MatchedGame = _.chain(response).find({'appid': game.appID })
+                    const MatchedGame = _.find(response, {'appid':  game.appID})
                     if(MatchedGame)
                     {
                         detail.games.push(game._id)
