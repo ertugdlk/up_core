@@ -18,9 +18,8 @@ class SteamUserDetail
         try
         {
             const response = await SteamAPI.getDetail({steamID : this.steamID})
-            const SteamUserDetail = new SteamUserDetail(response)
 
-            return SteamUserDetail
+            return response
         }
         catch(error)
         {
