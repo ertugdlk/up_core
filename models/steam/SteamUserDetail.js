@@ -1,10 +1,12 @@
 const _ = require('lodash')
 const Axios = require('axios')
+const Config = require('config')
 
 const DetailBuilder = require('../builders/DetailBuilder')
 const Detail = require('../Detail')
 const Game = require('../Game')
 const SteamAPI = require('./SteamAPI')
+const PlatformID = Config.get('platforms.steam._id')
 
 class SteamUserDetail
 {
@@ -31,13 +33,13 @@ class SteamUserDetail
     {
         try
         {
-            const platform = '5f9a84fca1f0c0b83de7d696'
+            const platform = PlatformID
             const response = await SteamAPI.getOwnedGames({steamID})
             const SteamGames = await Game.find({platform: platform})
             const detail = await Detail.findOne({ platform: platform , user: user})
 
-            SteamGames.map( game => {
-                    const MatchedGame = _.find(response, {'appid':  Number(game.appID)})
+            await SteamGames.map( game => {
+                    const MatchedGame = await _.find(response, {'appid':  Number(game.appID)})
                     if(MatchedGame)
                     {
                         detail.games.push(game._id)
@@ -57,7 +59,7 @@ class SteamUserDetail
 
     toDetail({ user })
     {
-        const platform = '5f9a84fca1f0c0b83de7d696'
+        const platform = PlatformID
 
         const builder = new DetailBuilder()
                         .name(_.get(this , 'personaname'))

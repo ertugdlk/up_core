@@ -16,7 +16,8 @@ const defaultConfig =
         "steam":
         {
             name:"Steam",
-            apiKey: "3F7E7FF7EC5EC88290ECF9ED3C63F642"
+            apiKey: "3F7E7FF7EC5EC88290ECF9ED3C63F642",
+            _id : '5f9a84fca1f0c0b83de7d696'
         }
     }
 }
