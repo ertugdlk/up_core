@@ -1,4 +1,0 @@
-describe('Credential Model Test', () => {
-    
-
-})
