@@ -30,9 +30,24 @@ class SteamAPI
 
             return _.get(response, 'data.response.games')
         }
-        catch
+        catch(error)
         {
-            
+            throw error
+        }
+    }
+
+    async controlVac({steamID})
+    {
+        try
+        {
+            const url = 'http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key='+ apiKey +'&steamids=' + steamID
+            const response = await Axios.get(url)
+
+            return _.get(response, 'data.response.players.0')
+        }
+        catch(error)
+        {
+            throw error
         }
     }
 
