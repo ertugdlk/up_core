@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
 const UserModel = require('../models/User')
-const userData = { nickname: 'phybarin', email: 'ertgdlk@gmail.com',
- password:'123456'}
+const userData = {
+    nickname: 'phybarin', email: 'ertgdlk@gmail.com',
+    password: '123456'
+}
 const bcrypt = require('bcrypt')
 
 describe('User Model Test', () => {
@@ -24,27 +26,27 @@ describe('User Model Test', () => {
         expect(savedUser.email).toBe(userData.email)
         expect(savedUser.nickname).toBe(userData.nickname)
     });
-    
+
     it('insert user successfully, undefined fields should be undefined', async () => {
-        const userWithInvalidField = new UserModel({ nickname: 'kaygan', email: 'ozanezer@gmail.com',
-        password:'123456', gender:'male'})
+        const userWithInvalidField = new UserModel({
+            nickname: 'kaygan', email: 'ozanezer@gmail.com',
+            password: '123456', gender: 'male'
+        })
         const savedUserWithInvalidField = await userWithInvalidField.save()
         expect(savedUserWithInvalidField._id).toBeDefined()
         expect(savedUserWithInvalidField.gender).toBeUndefined()
     })
 
-    
-    it('insert user without required field should be error', async() => {
-        const userWithoutRequiredField = new UserModel({email:'ercebekture@gmail.com', password:'123456'})
+
+    it('insert user without required field should be error', async () => {
+        const userWithoutRequiredField = new UserModel({ email: 'ercebekture@gmail.com', password: '123456' })
         let err
 
-        try
-        {
+        try {
             const savedUser = await userWithoutRequiredField.save()
             error = savedUser
         }
-        catch(error)
-        {
+        catch (error) {
             err = error
         }
 
@@ -52,23 +54,21 @@ describe('User Model Test', () => {
         expect(err.errors.nickname).toBeDefined()
     })
 
-    
-    it('When user created user password decryption works or not', async() => {
-        const user = await new UserModel({nickname:'berkanny', email:'berkanyuksel@gmail.com', password:'123456'})
+
+    it('When user created user password decryption works or not', async () => {
+        const user = await new UserModel({ nickname: 'berkanny', email: 'berkanyuksel@gmail.com', password: '123456' })
         const savedUser = await user.save()
         var boolError
-        const isPasswordMatch = bcrypt.compare(user.password , savedUser.password)
+        const isPasswordMatch = bcrypt.compare(user.password, savedUser.password)
 
-        if(!isPasswordMatch)
-        {
+        if (!isPasswordMatch) {
             boolError = false
         }
-        else
-        {
+        else {
             boolError = true
         }
 
         expect(boolError).toBe(true)
     })
-    
+
 })
