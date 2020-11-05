@@ -17,11 +17,10 @@ const DetailSchema = new Mongoose.Schema({
 }, {versionKey: false})
 
 //Pre save control
-
     DetailSchema.pre('save', async function (next) {
         const Detail = Mongoose.model('Detail' , DetailSchema)
         const filteredDetail = await Detail.findOne({user: this.user, platform: this.platform})
-        
+
         if(filteredDetail)
         {
             throw new error ({error:'Exist Detail for this platform and user'})
