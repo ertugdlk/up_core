@@ -16,4 +16,21 @@ const DetailSchema = new Mongoose.Schema({
     games: [Schema.Types.ObjectId]
 }, {versionKey: false})
 
+//Pre save control
+/*
+    DetailSchema.pre('save', async function (next) {
+        const detail = this
+        const Detail = Mongoose.model('Detail' , DetailSchema)
+        const filteredDetail = await Detail.findOne({user: this.user})
+        if(filteredDetail)
+        {
+            throw new error ({error:'Exist Detail for this platform and user'})
+        }
+        else
+        {
+            next()
+        }
+    })
+*/
+
 module.exports = Mongoose.model('Detail' , DetailSchema)
