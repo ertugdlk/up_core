@@ -19,9 +19,8 @@ const DetailSchema = new Mongoose.Schema({
 //Pre save control
 /*
     DetailSchema.pre('save', async function (next) {
-        const detail = this
         const Detail = Mongoose.model('Detail' , DetailSchema)
-        const filteredDetail = await Detail.findOne({user: this.user})
+        const filteredDetail = await Detail.findOne({user: this.user, platform: this.platform})
         if(filteredDetail)
         {
             throw new error ({error:'Exist Detail for this platform and user'})
