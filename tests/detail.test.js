@@ -54,7 +54,6 @@ describe("Detail Model Test", () => {
     } catch (error) {
       err = error
     }
-    expect(err).toBeInstanceOf(Mongoose.Error)
-    expect(err.errors.nickname).toBeDefined()
+    expect(err).toBeInstanceOf(ReferenceError)
   });
 });
