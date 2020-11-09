@@ -13,7 +13,12 @@ const DetailSchema = new Mongoose.Schema({
         type: String,
         required: true
     },
-    games: [Schema.Types.ObjectId]
+    games: [
+        {
+        id: {type: Schema.Types.ObjectId},
+        ign: { type: String },
+        }
+    ]
 }, {versionKey: false})
 
 //Pre save control
