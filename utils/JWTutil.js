@@ -7,11 +7,14 @@ class JWTutil
     {
         const authorizationHeader = _.get(req, 'headers.authorization')
         const bodyAccessToken = _.get(req, 'body.accessToken')
+        const cookieToken = _.get(req, 'cookies.token')
 
         if(authorizationHeader && _.includes(authorizationHeader, 'Bearer'))
             return _.get(req.headers, 'authorization').replace('Bearer ', '')
         else if(bodyAccessToken)
             return bodyAccessToken
+        else if(cookieToken)
+            return cookieToken    
         else
             return null
     }
