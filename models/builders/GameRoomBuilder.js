@@ -4,6 +4,10 @@ class GameRoomBuilder {
     constructor() {
         this.gameRoom = {}
     }
+    GameId(GameId){
+        this.gameRoom.GameId = GameId
+        return this
+    }
 
     GameName(GameName) {
         this.gameRoom.GameName = GameName
