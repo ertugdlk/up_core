@@ -1,55 +1,47 @@
-const redis = require('redis')
-const client = redis.createClient({
-    port: 6379
-})
+let redis = require('redis')
+let client = redis.createClient({
+    port: 6379,
+});
 
-const createRoom = async (SocketId , GameRoomObject) => {
-    try
-    {
+const createRoom = async (SocketId, GameRoomObject) => {
+    try {
         const encodedGameRoom = JSON.stringify(GameRoomObject)
-        const message = await client.set('room:'+SocketId, encodedGameRoom)   
+        const message = await client.set('room:' + SocketId, encodedGameRoom)
 
-        if(message === "OK"){
+        if (message === "OK") {
             return 'success'
         }
-        else{
+        else {
             return 'failed'
         }
     }
-    catch(err)
-    {
+    catch (err) {
         throw error
     }
 }
 
 const getRoom = async (SocketId) => {
-    try
-    {
-        const encodedGameRoom = await client.GET('room:'+SocketId)
+    try {
+        const encodedGameRoom = await client.GET('room:' + SocketId)
         const decodedGameRoom = JSON.parse(encodedGameRoom)
 
-        if(decodedGameRoom)
-        {
+        if (decodedGameRoom) {
             return "success"
         }
-        else
-        {
+        else {
             return "failed"
         }
     }
-    catch(error)
-    {
+    catch (error) {
         throw error
     }
 }
 
 const closeRoom = async (SocketId) => {
-    try
-    {
-        await client.del('room:'+SocketId)
+    try {
+        await client.del('room:' + SocketId)
     }
-    catch(error)
-    {
+    catch (error) {
         throw error
     }
 }
