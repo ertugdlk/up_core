@@ -17,10 +17,12 @@ class GameRoomBuilder {
 
     GameType(GameType) {
         this.gameRoom.GameType = GameType
+        return this
     }
 
     EntryFee(EntryFee) {
         this.gameRoom.EntryFee = EntryFee
+        return this
     }
 
     Reward(Reward) {
