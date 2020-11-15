@@ -27,17 +27,14 @@ const createRoom = async (SocketId , GameRoomObject) => {
 const getRoom = async (SocketId) => {
     try
     {
-        const encodedGameRoom = await client.GET('room:'+SocketId)
-        const decodedGameRoom = JSON.parse(encodedGameRoom)
-
-        if(decodedGameRoom)
-        {
-            return "success"
-        }
-        else
-        {
-            return "failed"
-        }
+        client.GET('room:'+SocketId , (err ,data) => {
+            if(err) {
+                return 'failed' + err
+            }
+            
+            const decodedGameRoom = JSON.parse(data)
+            return decodedGameRoom
+        })
     }
     catch(error)
     {
