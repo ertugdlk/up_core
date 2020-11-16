@@ -24,7 +24,7 @@ const createRoom = async (SocketId , GameRoomObject) => {
     }
 }
 
-const getRoom = async (SocketId) => {
+function getRoom (SocketId , callback) {
     try
     {
         client.GET('room:'+SocketId , (err ,data) => {
@@ -33,7 +33,7 @@ const getRoom = async (SocketId) => {
             }
             
             const decodedGameRoom = JSON.parse(data)
-            return decodedGameRoom
+            callback(decodedGameRoom)
         })
     }
     catch(error)
