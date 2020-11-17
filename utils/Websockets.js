@@ -6,7 +6,7 @@ class Websockets {
 
         client.on("create" , (gameData) => {
             const returnMessage = createRoom(client.id, gameData)
-            console.log(client.id)
+            const rooms = getRooms()
             client.emit("createReturn" , (returnMessage))
         })
 
@@ -16,7 +16,7 @@ class Websockets {
 
         client.on("close", () => {
             closeRoom(client.id)
-          });
+          })
     }
 }
 
