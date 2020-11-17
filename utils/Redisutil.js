@@ -29,7 +29,6 @@ function getRooms(callback) {
                 return err
             }
             callback(reply)
-
         })
     }
     catch (error) {

@@ -4,6 +4,21 @@ const gameRoomData2 = { GameId: '1234', GameName: 'CSGO2', GameMap: 'DUST3', Gam
 const redis = require('redis')
 const client = redis.createClient(6379);
 
+function getRooms(callback) {
+    try {
+        client.scan(0, (err, reply) => {
+            if (err) {
+                return err
+            }
+            callback(reply)
+        })
+    }
+    catch (error) {
+        throw error
+    }
+
+}
+
 describe("Redis Test", () => {
 
     it("Game Builder createRoom check", async () => {
