@@ -8,20 +8,20 @@ describe("Redis Test", () => {
 
     it("Game Builder createRoom check", async () => {
         const builder = new GameRoomBuilder()
-                        .GameId(gameRoomData.GameId)
-                        .GameMap(gameRoomData.GameMap)
-                        .GameName(gameRoomData.GameName)
-                        .Host(gameRoomData.Host)
-                        .Reward(gameRoomData.Reward)
+            .GameId(gameRoomData.GameId)
+            .GameMap(gameRoomData.GameMap)
+            .GameName(gameRoomData.GameName)
+            .Host(gameRoomData.Host)
+            .Reward(gameRoomData.Reward)
 
         const gameroomobject = builder.build()
         const encoded = JSON.stringify(gameroomobject.__wrapped__)
         client.set('room:1', encoded)
-        client.get('room:1', function(err, result) {
-            if(err){
+        client.get('room:1', function (err, result) {
+            if (err) {
 
             }
-            else{
+            else {
                 const decoded = JSON.parse(result)
                 client.end()
                 expect(gameroomobject.__wrapped__).toStrictEqual(decoded)

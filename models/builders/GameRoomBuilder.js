@@ -4,7 +4,7 @@ class GameRoomBuilder {
     constructor() {
         this.gameRoom = {}
     }
-    GameId(GameId){
+    GameId(GameId) {
         this.gameRoom.GameId = GameId
         return this
     }

@@ -5,50 +5,60 @@ const client = redis.createClient({
     password: process.env.redis_password
 })
 
-const createRoom = async (SocketId , GameRoomObject) => {
-    try
-    {
+const createRoom = async (SocketId, GameRoomObject) => {
+    try {
         const encodedGameRoom = JSON.stringify(GameRoomObject)
-        const message = await client.set('room:'+SocketId, encodedGameRoom)   
+        const message = await client.set('room:' + SocketId, encodedGameRoom)
 
-        if(message === "OK"){
+        if (message === "OK") {
             return 'success'
         }
-        else{
+        else {
             return 'failed'
         }
     }
-    catch(err)
-    {
+    catch (err) {
         throw error
     }
 }
 
-function getRoom (SocketId , callback) {
-    try
-    {
-        client.GET('room:'+SocketId , (err ,data) => {
-            if(err) {
+function getRooms(callback) {
+    try {
+        client.scan(0, (err, reply) => {
+            if (err) {
+                return err
+            }
+            callback(reply)
+
+        })
+    }
+    catch (error) {
+        throw error
+    }
+
+}
+
+function getRoom(key, callback) {
+    try {
+        client.GET(key, (err, data) => {
+            if (err) {
                 return 'failed' + err
             }
-            
+
             const decodedGameRoom = JSON.parse(data)
             callback(decodedGameRoom)
         })
     }
-    catch(error)
-    {
+    catch (error) {
         throw error
     }
 }
 
 const closeRoom = async (SocketId) => {
-    try
-    {
-        await client.del('room:'+SocketId)
+    try {
+        await client.del('room:' + SocketId)
     }
-    catch(error)
-    {
+    catch (error) {
         throw error
     }
 }
@@ -56,5 +66,6 @@ const closeRoom = async (SocketId) => {
 module.exports = {
     getRoom,
     createRoom,
-    closeRoom
+    closeRoom,
+    getRooms,
 }
