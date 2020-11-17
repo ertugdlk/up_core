@@ -13,7 +13,8 @@ class Websockets {
                 const rooms = []
                 list.map(key => {
                     getRoom(key, (err, result) => {
-                        rooms.push(result)
+                        rooms.push(result) 
+                        
                     })
                 })
             })
