@@ -5,7 +5,7 @@ var clients = []
 class Websockets {
     connection(client) {
         client.on('client_info' , (data) => {
-            client.id = '123'
+            client.id = data
         })
 
         console.log(client.id + ' user connected')
