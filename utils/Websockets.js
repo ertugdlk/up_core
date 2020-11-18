@@ -1,18 +1,16 @@
 const { createRoom, closeRoom, getRoom, getRooms } = require('./RedisUtil')
 const _ = require('lodash')
-var list = []
-var rooms = []
-var deneme = {}
+var clients = []
 
 class Websockets {
     connection(client) {
-        client.generateId = function (req) {
-            return 1
-        }
+        client.on('client_info' , (data) => {
+            client.id = '123'
+        })
+
+        console.log(client.id + ' user connected')
         
-        console.log(client.id + 'user connected')
-        
-        client.emit("rooms", deneme)
+        client.emit("rooms", 'deneme')
 
         client.on("create", (gameData) => {
             const returnMessage = createRoom(client.id, gameData)
@@ -29,7 +27,7 @@ class Websockets {
         })
 
         client.on('disconnect', () => {
-            console.log(client.id + 'disconnected')
+            console.log(client.id + ' disconnected')
         })
     }
 }
