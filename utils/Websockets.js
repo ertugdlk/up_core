@@ -2,7 +2,12 @@ const { createRoom, closeRoom, getRoom, getRooms } = require('./RedisUtil')
 const _ = require('lodash')
 var clients = []
 
+io.engine.generateId = (req) => {
+    return "custom:id:" + 1++; // custom id must be unique
+  }
+
 class Websockets {
+
     connection(client) {
         client.on('client_info' , (data) => {
             client.id = data
