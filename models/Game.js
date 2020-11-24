@@ -15,7 +15,13 @@ const GameSchema = new Mongoose.Schema({
     ignNeeded: {
         type: Boolean,
         default: false
-    }
+    },
+    maps:[{
+        type: String,
+    }],
+    types:[{
+        type: String
+    }],
 }, { versionKey: false })
 
 module.exports = Mongoose.model('Game', GameSchema)
