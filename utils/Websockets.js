@@ -11,7 +11,7 @@ class Websockets {
         //Nickname cookie den mi çekilsin yoksa client mi göndersin
         //const cookies = cookie.parse(socket.request.headers.cookie || '');
 
-        client.on('login' , (data) => {
+        client.on('login' , async (data) => {
             //check data nickname exist or not
 
 
@@ -53,7 +53,7 @@ class Websockets {
             console.log(data.nickname + client.id + ' user connected')
         })
 
-        client.on("create", (gameData) => {
+        client.on("create", async (gameData) => {
             //save room in MongoDB info and room
 
             const gameInfo = new GameRoomInfo()
@@ -69,7 +69,7 @@ class Websockets {
             client.emit('newRoom' , gameInfo)
         })
 
-        client.on("join", (socketId) => {
+        client.on("join",  (socketId) => {
             client.to("socketId")
         })
 
@@ -77,7 +77,7 @@ class Websockets {
             closeRoom(client.id)
         })
 
-        client.on('disconnect', (data) => {
+        client.on('disconnect', async(data) => {
             //Check running or waiting game room for user
             //if there is no exist game room just disconnect
 
