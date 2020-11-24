@@ -19,10 +19,10 @@ class Websockets {
             const user = _.filter(clients, {nickname: data.nickname})
             if(!user){
                 //check user host in any opened room
-                const openedRoom = await GameRoom.findOne({host: data.nickname})
-                if(openedRoom){
+                const hostedRoom = await GameRoom.findOne({host: data.nickname})
+                if(hostedRoom){
                     //if there was any room or operation Host by this user unset expire date for them
-                    await GameRoom.update(openedRoom._id, { $unset: { expireAt: 1 }})
+                    await GameRoom.update(hostedRoom._id, { $unset: { expireAt: 1 }})
                 }
                 //if there was any room or operation Host by this user unset expire date for them
                 const openedRoom = await GameRoom.findOne({users: data.nickname})
@@ -39,6 +39,7 @@ class Websockets {
                 clients.push(newUser)
             }
             else{
+                console.log(user)
                 user.sockets.push(client.id)
                 //Check User's operations and apply them to new connection
                 //Find roomId with nickname on MongoDB room table
