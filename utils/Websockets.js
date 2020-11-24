@@ -13,8 +13,7 @@ class Websockets {
 
         client.on('login' , async (data) => {
             //check data nickname exist or not
-
-
+            console.log(data + "")
 
             const user = _.filter(clients, {nickname: data.nickname})
             if(!user){
