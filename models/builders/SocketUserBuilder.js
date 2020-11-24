@@ -8,13 +8,13 @@ class SocketUserBuilder {
         this.socketUser.nickname = nickname
         return this
     }
-    sockets(socketId) {
+    sockets(sockets) {
         this.socketUser.sockets = sockets
         return this
     }
 
     build() {
-        const createdSocketUser = _.chain(this.gameRoom).value()
+        const createdSocketUser = _.chain(this.socketUser).value()
 
         return createdSocketUser
     }

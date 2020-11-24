@@ -5,30 +5,41 @@ const GameRoomInfo = require('../models/GameRoomInfo')
 const _ = require('lodash')
 var clients = []
 
+async function findHostedRoom(data_nickname)
+{
+    const hostedRoom = await GameRoom.findOne({host: data_nickname})
+    if(hostedRoom){
+        //if there was any room or operation Host by this user unset expire date for them
+        await GameRoom.update(hostedRoom._id, { $unset: { expireAt: 1 }})
+    }
+}
+
+async function findOpenedRoom(client,data_nickname)
+{
+    const openedRoom = await GameRoom.findOne({users: data_nickname})
+    if(openedRoom){
+        client.to(openedRoom.roomId)
+    }
+}
+
 class Websockets {
 
     connection(client) {
         //Nickname cookie den mi çekilsin yoksa client mi göndersin
         //const cookies = cookie.parse(socket.request.headers.cookie || '');
 
-        client.on('login' , async (data_nickname) => {
+        client.on("login" , (data_nickname) => {
             //check data nickname exist or not
-            console.log(data_nickname + "")
+            console.log(data_nickname)
 
             const user = _.filter(clients, {nickname: data_nickname})
-            if(!user){
+            console.log(user[0])
+            if(!user[0] ){
                 //check user host in any opened room
-                const hostedRoom = await GameRoom.findOne({host: data_nickname})
-                if(hostedRoom){
-                    //if there was any room or operation Host by this user unset expire date for them
-                    await GameRoom.update(hostedRoom._id, { $unset: { expireAt: 1 }})
-                }
+                findHostedRoom(data_nickname)
                 //if there was any room or operation Host by this user unset expire date for them
-                const openedRoom = await GameRoom.findOne({users: data_nickname})
+                findOpenedRoom(client, data_nickname)
 
-                if(openedRoom){
-                    client.to(openedRoom.roomId)
-                }
                 const sockets = [client.id]
                 const newUserBuilder = new SocketUserBuilder()
                                         .nickname(data_nickname)
@@ -36,18 +47,13 @@ class Websockets {
 
                 const newUser = newUserBuilder.build()
                 clients.push(newUser)
+                console.log(clients)
             }
             else{
-                console.log(user)
-                user.sockets.push(client.id)
+                user[0].sockets.push(client.id)
                 //Check User's operations and apply them to new connection
                 //Find roomId with nickname on MongoDB room table
-                const openedRoom = await GameRoom.findOne({users: data_nickname} )
-                //Add new socketid to client.to(roomId)
-                if(openedRoom)
-                {
-                    client.to(openedRoom.roomId)
-                }
+                findOpenedRoom(client, data_nickname)
             }
 
             console.log(data_nickname + client.id + ' user connected')
