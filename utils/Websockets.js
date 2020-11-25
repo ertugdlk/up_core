@@ -104,9 +104,9 @@ class Websockets {
             const user = _.find(clients , function (client) {
                 return _.filter(client.sockets , client.id)
             })
-            console.log(user[0])
-            console.log(user[0].sockets)
-            _.remove(user[0].sockets , function(socket) {
+            console.log(user)
+            console.log(user.sockets)
+            _.remove(user.sockets , function(socket) {
                     return socket == client.id
                 })
             
