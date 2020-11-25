@@ -22,6 +22,19 @@ async function findOpenedRoom(client,data_nickname)
     }
 }
 
+async function deleteHostedRoom(data_nickname)
+{
+    const openedRoom = await GameRoom.findOne({host: data_nickname})
+    if(openedRoom)
+    {
+        //Exist game room => MongoDB keep this nickname 3-5 mins in game room data
+        //Set expire date for created or hosted room
+        await GameRoom.update(openedRoom._id, { expireAt: moment().add(3, 'minutes')})
+        //send emit to room with 3min close message
+        client.emit('closeRoom' , 3600)
+    }
+}
+
 class Websockets {
 
     connection(client) {
@@ -83,22 +96,25 @@ class Websockets {
             closeRoom(client.id)
         })
 
-        client.on('disconnect', async(data) => {
+        client.on('disconnect', (data_nickname) => {
             //Check running or waiting game room for user
             //if there is no exist game room just disconnect
 
             //delete this client id from clients array
-            const user = _.filter(clients, {nickname: data.nickname})
-
-            const openedRoom = await GameRoom.findOne({host: data.nickname})
-            if(openedRoom)
-            {
-                //Exist game room => MongoDB keep this nickname 3-5 mins in game room data
-                //Set expire date for created or hosted room
-                await GameRoom.update(openedRoom._id, { expireAt: moment().add(3, 'minutes')})
-                //send emit to room with 3min close message
-                client.emit('')
+            const user = _.filter(clients, {nickname: data_nickname})
+            _.remove(user[0].sockets , function(socket) {
+                    return socket == client.id
+                })
+            
+            if(user[0].sockets == []){
+                _.remove(clients, function(user){
+                    return user.nickname == user[0].nickname
+                })
             }
+            console.log("new array" + clients)
+
+            deleteHostedRoom(data_nickname)
+
             console.log(client.id + ' disconnected')
         })
     }
