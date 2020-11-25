@@ -96,7 +96,7 @@ class Websockets {
             closeRoom(client.id)
         })
 
-        client.on('disconnect', (data_nickname) => {
+        client.on('disconnect', () => {
             //Check running or waiting game room for user
             //if there is no exist game room just disconnect
 
@@ -110,14 +110,14 @@ class Websockets {
                     return socket == client.id
                 })
             
-            if(user[0].sockets == []){
-                _.remove(clients, function(user){
-                    return user.nickname == user[0].nickname
+            if(user.sockets == []){
+                _.remove(clients, function(client){
+                    return client.nickname == user.nickname
                 })
             }
             console.log("new array" + clients)
 
-            deleteHostedRoom(data_nickname)
+            deleteHostedRoom(user.nickname)
 
             console.log(client.id + ' disconnected')
         })
