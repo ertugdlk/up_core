@@ -101,7 +101,7 @@ class Websockets {
             //if there is no exist game room just disconnect
 
             //delete this client id from clients array
-            const user = _.filter(clients, {nickname: data_nickname})
+            const user = _.filter(clients, {sockets: client.id})
             console.log(user[0])
             console.log(user[0].sockets)
             _.remove(user[0].sockets , function(socket) {
