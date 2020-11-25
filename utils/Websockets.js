@@ -102,6 +102,8 @@ class Websockets {
 
             //delete this client id from clients array
             const user = _.filter(clients, {nickname: data_nickname})
+            console.log(user[0])
+            console.log(user[0].sockets)
             _.remove(user[0].sockets , function(socket) {
                     return socket == client.id
                 })
