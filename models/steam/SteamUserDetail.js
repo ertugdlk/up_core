@@ -29,14 +29,13 @@ class SteamUserDetail
         }
     }
 
-    static async matchGames({steamID, user})
+    static async matchGames({steamID, user , detail})
     {
         try
         {
             const platform = PlatformID
             const response = await SteamAPI.getOwnedGames({steamID})
             const SteamGames = await Game.find({platform: platform})
-            const detail = await Detail.findOne({ platform: platform , user: user})
 
             await SteamGames.map( game => {
                     const MatchedGame = _.find(response, {'appid':  Number(game.appID)})
