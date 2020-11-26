@@ -5,7 +5,7 @@ const GameRoomInfo = require('../models/GameRoomInfo')
 const _ = require('lodash')
 var clients = []
 
-async function findHostedRoom(data_nickname)
+async function findHostedRoomUpdate(data_nickname)
 {
     const hostedRoom = await GameRoom.findOne({host: data_nickname})
     if(hostedRoom){
@@ -14,7 +14,7 @@ async function findHostedRoom(data_nickname)
     }
 }
 
-async function findOpenedRoom(client,data_nickname)
+async function findOpenedRoomUpdate(client,data_nickname)
 {
     const openedRoom = await GameRoom.findOne({users: data_nickname})
     if(openedRoom){
@@ -49,9 +49,9 @@ class Websockets {
             console.log(user[0])
             if(!user[0] ){
                 //check user host in any opened room
-                findHostedRoom(data_nickname)
+                findHostedRoomUpdate(data_nickname)
                 //if there was any room or operation Host by this user unset expire date for them
-                findOpenedRoom(client, data_nickname)
+                findOpenedRoomUpdate(client, data_nickname)
 
                 const sockets = [client.id]
                 const newUserBuilder = new SocketUserBuilder()
@@ -66,13 +66,14 @@ class Websockets {
                 user[0].sockets.push(client.id)
                 //Check User's operations and apply them to new connection
                 //Find roomId with nickname on MongoDB room table
-                findOpenedRoom(client, data_nickname)
+                findOpenedRoomUpdate(client, data_nickname)
             }
 
             console.log(data_nickname + client.id + ' user connected')
         })
 
         client.on("create", async (gameData) => {
+
             //save room in MongoDB info and room
 
             const gameInfo = new GameRoomInfo()
@@ -104,8 +105,7 @@ class Websockets {
             const user = _.find(clients , function (client) {
                 return _.filter(client.sockets , client.id)
             })
-            console.log(user)
-            console.log(user.sockets)
+
             _.remove(user.sockets , function(socket) {
                     return socket == client.id
                 })
@@ -115,11 +115,8 @@ class Websockets {
                     return client.nickname == user.nickname
                 })
             }
-            console.log("new array" + clients)
 
             deleteHostedRoom(user.nickname)
-
-            console.log(client.id + ' disconnected')
         })
     }
 }
