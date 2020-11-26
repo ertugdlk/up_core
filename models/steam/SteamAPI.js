@@ -43,7 +43,7 @@ class SteamAPI
             const url = 'http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key='+ apiKey +'&steamids=' + steamID
             const response = await Axios.get(url)
 
-            return _.get(response, 'data.response.0')
+            return _.get(response, 'data.players.0')
         }
         catch(error)
         {
