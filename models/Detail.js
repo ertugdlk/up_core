@@ -15,7 +15,8 @@ const DetailSchema = new Mongoose.Schema({
     },
     games: [
         {
-        id: {type: Schema.Types.ObjectId},
+        _id:false,
+        id: {type: Schema.Types.ObjectId, ref:'Game'},
         ign: { type: String },
         }
     ]
