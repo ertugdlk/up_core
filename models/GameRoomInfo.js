@@ -1,7 +1,8 @@
 const Mongoose = require('mongoose')
+const Schema   = Mongoose.Schema
 
 const GameRoomInfoSchema = new Mongoose.Schema({
-    appId:{
+    name:{
         type: String,
         required: true
     },
@@ -29,6 +30,6 @@ const GameRoomInfoSchema = new Mongoose.Schema({
         required: true
 
     },
-})
+},  {versionKey: false})
 
 module.exports = Mongoose.model('GameRoomInfo' , GameRoomInfoSchema)

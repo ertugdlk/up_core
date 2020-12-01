@@ -1,4 +1,5 @@
 const Mongoose = require('mongoose')
+const Schema   = Mongoose.Schema
 
 const GameRoomSchema = new Mongoose.Schema(
 {
@@ -7,6 +8,7 @@ const GameRoomSchema = new Mongoose.Schema(
         unique:true,
         required: true,
     },
+    roomInfo: { type: Schema.Types.ObjectId, ref: 'GameRoomInfo' },
     host:{
         type: String,
         unique: true,
@@ -14,10 +16,12 @@ const GameRoomSchema = new Mongoose.Schema(
     },
     users: [{
         type: String,
+        default: []
     }],
     status: {
         type: String,
         required: true,
+        default: 'waiting'
     },
     createdAt: { type: Date, default: Date.now },
     expireAt: { type: Date, default: undefined },

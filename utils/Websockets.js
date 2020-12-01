@@ -42,51 +42,58 @@ class Websockets {
         //const cookies = cookie.parse(socket.request.headers.cookie || '');
 
         client.on("login" , (data_nickname) => {
-            //check data nickname exist or not
-            console.log(data_nickname)
+            try{
+                //check data nickname exist or not
+                console.log(data_nickname)
 
-            const user = _.filter(clients, {nickname: data_nickname})
-            console.log(user[0])
-            if(!user[0] ){
-                //check user host in any opened room
-                findHostedRoomUpdate(data_nickname)
-                //if there was any room or operation Host by this user unset expire date for them
-                findOpenedRoomUpdate(client, data_nickname)
+                const user = _.filter(clients, {nickname: data_nickname})
+                console.log(user[0])
+                if(!user[0] ){
+                    //check user host in any opened room
+                    findHostedRoomUpdate(data_nickname)
+                    //if there was any room or operation Host by this user unset expire date for them
+                    findOpenedRoomUpdate(client, data_nickname)
 
-                const sockets = [client.id]
-                const newUserBuilder = new SocketUserBuilder()
-                                        .nickname(data_nickname)
-                                        .sockets(sockets)
+                    const sockets = [client.id]
+                    const newUserBuilder = new SocketUserBuilder()
+                                            .nickname(data_nickname)
+                                            .sockets(sockets)
 
-                const newUser = newUserBuilder.build()
-                clients.push(newUser)
-                console.log(clients)
+                    const newUser = newUserBuilder.build()
+                    clients.push(newUser)
+                    console.log(clients)
+                }
+                else{
+                    user[0].sockets.push(client.id)
+                    //Check User's operations and apply them to new connection
+                    //Find roomId with nickname on MongoDB room table
+                    findOpenedRoomUpdate(client, data_nickname)
+                }
+                console.log(data_nickname + client.id + ' user connected')
             }
-            else{
-                user[0].sockets.push(client.id)
-                //Check User's operations and apply them to new connection
-                //Find roomId with nickname on MongoDB room table
-                findOpenedRoomUpdate(client, data_nickname)
+            catch(error){
+                throw error
             }
-
-            console.log(data_nickname + client.id + ' user connected')
         })
 
         client.on("create", async (gameData) => {
+            try{
+                //save room in MongoDB info and room
+                const gameInfo = new GameRoomInfo({name: gameData.name , type: gameData.type, map: gameData.map, fee: gameData.fee, reward: gameData.fee*2, createdAt: Date.now()})
+                const savedGameInfo = await gameInfo.save()
 
-            //save room in MongoDB info and room
+                const gameRoom = new GameRoom({roomId: client.id, roomInfo: savedGameInfo._id, host: gameData.nickname})
+                await gameRoom.save()
 
-            const gameInfo = new GameRoomInfo()
-            await gameInfo.save()
+                //send client to room 
+                client.to(gameRoom.roomId)
 
-            const gameRoom = new GameRoom()
-            await gameRoom.save()
-
-            //send client to room 
-            client.to(gameRoom.roomId)
-
-            //on every create send set new rooms for every socket
-            client.emit('newRoom' , gameInfo)
+                //on every create send set new rooms for every socket
+                client.broadcast.emit('newRoom' , gameInfo)
+            }
+            catch(error){
+                throw error
+            }
         })
 
         client.on("join",  (socketId) => {
@@ -100,23 +107,27 @@ class Websockets {
         client.on('disconnect', () => {
             //Check running or waiting game room for user
             //if there is no exist game room just disconnect
-
-            //delete this client id from clients array
-            const user = _.find(clients , function (client) {
-                return _.filter(client.sockets , client.id)
-            })
-
-            _.remove(user.sockets , function(socket) {
-                    return socket == client.id
+            try{
+                //delete this client id from clients array
+                const user = _.find(clients , function (client) {
+                    return _.filter(client.sockets , client.id)
                 })
-            
-            if(user.sockets == []){
-                _.remove(clients, function(client){
-                    return client.nickname == user.nickname
-                })
+
+                _.remove(user.sockets , function(socket) {
+                        return socket == client.id
+                    })
+                
+                if(user.sockets == []){
+                    _.remove(clients, function(client){
+                        return client.nickname == user.nickname
+                    })
+                }
+
+                deleteHostedRoom(user.nickname)
             }
-
-            deleteHostedRoom(user.nickname)
+            catch(error){
+                throw error
+            }
         })
     }
 }
