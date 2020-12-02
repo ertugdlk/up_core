@@ -82,12 +82,12 @@ class Websockets {
                 const gameInfo = new GameRoomInfo({name: gameData.name , type: gameData.type, map: gameData.map, fee: gameData.fee, reward: gameData.fee*2, createdAt: gameData.createdAt})
                 const savedGameInfo = await gameInfo.save()
 
-                const gameRoom = new GameRoom({roomId: client.id, roomInfo: savedGameInfo._id, host: gameData.nickname})
+                const gameRoom = new GameRoom({roomId: client.id, roomInfo: savedGameInfo._id, host: gameData.host})
                 await gameRoom.save()
 
                 //send client to room 
                 client.to(gameRoom.roomId)
-                
+
 
                 //on every create send set new rooms for every socket
                 //client.broadcast.emit('newRoom' , gameInfo)
