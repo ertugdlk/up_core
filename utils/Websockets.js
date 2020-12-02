@@ -87,6 +87,7 @@ class Websockets {
 
                 //send client to room 
                 client.to(gameRoom.roomId)
+                
 
                 //on every create send set new rooms for every socket
                 //client.broadcast.emit('newRoom' , gameInfo)
