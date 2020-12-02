@@ -79,7 +79,7 @@ class Websockets {
         client.on("create", async (gameData) => {
             try{
                 //save room in MongoDB info and room
-                const gameInfo = new GameRoomInfo({name: gameData.name , type: gameData.type, map: gameData.map, fee: gameData.fee, reward: gameData.fee*2, createdAt: Date.now()})
+                const gameInfo = new GameRoomInfo({name: gameData.name , type: gameData.type, map: gameData.map, fee: gameData.fee, reward: gameData.fee*2, createdAt: gameData.createdAt})
                 const savedGameInfo = await gameInfo.save()
 
                 const gameRoom = new GameRoom({roomId: client.id, roomInfo: savedGameInfo._id, host: gameData.nickname})
@@ -89,7 +89,7 @@ class Websockets {
                 client.to(gameRoom.roomId)
 
                 //on every create send set new rooms for every socket
-                client.broadcast.emit('newRoom' , gameInfo)
+                //client.broadcast.emit('newRoom' , gameInfo)
             }
             catch(error){
                 throw error
