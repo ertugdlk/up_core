@@ -10,7 +10,7 @@ const userModel = new Mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        minlength:4
+        minlength: 4
     },
     email: {
         type: String,
@@ -19,7 +19,7 @@ const userModel = new Mongoose.Schema({
         lowercase: true,
         validate: value => {
             if (!Validator.isEmail(value)) {
-                throw new Error({error: 'Invalid Email address'})
+                throw new Error({ error: 'Invalid Email address' })
             }
         }
     },
@@ -35,6 +35,10 @@ const userModel = new Mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -47,22 +51,19 @@ userModel.pre('save', async function (next) {
     next()
 })
 
-userModel.methods.generateAuthToken = async function() {
+userModel.methods.generateAuthToken = async function () {
     // Generate an auth token for the userId
     this.password = ''
     const accessToken = await JWTUtil.sign(this, Config.get('jwt'))
     return accessToken
 }
 
-userModel.methods.findByCredentials = async function(password)
-{
-    const isPasswordMatch = bcrypt.compare(password , this.password)
-    if(!isPasswordMatch)
-    {
-        throw new error ({error:'Invalid'})
+userModel.methods.findByCredentials = async function (password) {
+    const isPasswordMatch = bcrypt.compare(password, this.password)
+    if (!isPasswordMatch) {
+        throw new error({ error: 'Invalid' })
     }
-    else
-    {
+    else {
         return true
     }
 }
