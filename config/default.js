@@ -19,5 +19,11 @@ const defaultConfig =
             apiKey: "3F7E7FF7EC5EC88290ECF9ED3C63F642",
             _id : '5f9a84fca1f0c0b83de7d696'
         }
+    },
+    "rcon":
+    {
+        host:"213.243.44.6",
+        port:27015,
+        password:"jazz3dtr",
     }
 }

@@ -19,6 +19,7 @@
     "nodemailer": "^6.4.16",
     "passport": "^0.4.1",
     "passport-steam": "^1.0.14",
+    "rcon-client": "^4.2.3",
     "redis": "^3.0.2",
     "validator": "13.1.17"
   },

@@ -23,7 +23,6 @@ describe("Redis Test", () => {
 
     it("Game Builder createRoom check", async () => {
         const builder = new GameRoomBuilder()
-            .GameId(gameRoomData.GameId)
             .GameMap(gameRoomData.GameMap)
             .GameName(gameRoomData.GameName)
             .Host(gameRoomData.Host)
