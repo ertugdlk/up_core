@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const Config = require('config')
 
 const redis = require('redis')
 const client = redis.createClient({
