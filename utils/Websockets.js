@@ -4,6 +4,7 @@ const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
 const _ = require('lodash')
 var clients = []
+//bu array global mi
 
 async function findHostedRoomUpdate(data_nickname)
 {
@@ -79,7 +80,7 @@ class Websockets {
         client.on("create", async (gameData) => {
             try{
                 //save room in MongoDB info and room
-                const gameInfo = new GameRoomInfo({name: gameData.name , type: gameData.type, map: gameData.map, fee: gameData.fee, reward: gameData.fee*2, createdAt: gameData.createdAt})
+                const gameInfo = new GameRoomInfo({room: client.id, name: gameData.name , type: gameData.type, host:gameData.host,  map: gameData.map, fee: gameData.fee, reward: gameData.fee*2, createdAt: gameData.createdAt})
                 const savedGameInfo = await gameInfo.save()
 
                 const gameRoom = new GameRoom({roomId: client.id, roomInfo: savedGameInfo._id, host: gameData.host})
@@ -90,15 +91,23 @@ class Websockets {
 
 
                 //on every create send set new rooms for every socket
-                //client.broadcast.emit('newRoom' , gameInfo)
+                client.broadcast.emit('newRoom' , gameInfo)
             }
             catch(error){
                 throw error
             }
         })
 
-        client.on("join",  (socketId) => {
-            client.to("socketId")
+        client.on("join",  (socketId, nickname) => {
+            //find gameroominfo with socket id and update userCount field
+
+            //find GameRoom and update users array with nickname
+
+
+            //connect this socketId to gameroom's roomid
+            //client.to("socketId")
+
+            //send emit to react for game room component
         })
 
         client.on("close", () => {

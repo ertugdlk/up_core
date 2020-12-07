@@ -6,7 +6,20 @@ const GameRoomInfoSchema = new Mongoose.Schema({
         type: String,
         required: true
     },
+    room:{
+        type: String,
+        required: true
+    },
+    userCount:{
+        type: Number,
+        default: 1
+    },
     type:
+    {
+        type: String,
+        required: true
+    },
+    host:
     {
         type: String,
         required: true
