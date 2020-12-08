@@ -9,8 +9,7 @@ const client = redis.createClient({
 })
 
 function createRandom() {
-    var otp = Math.random();
-    otp = otp * 1000000;
+    var otp = Math.floor(1000 + Math.random() * 9000)
     otp = parseInt(otp);
     return otp;
 }
@@ -29,42 +28,40 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendOtp(mail) {
-    try
-    {
+    try {
         const rand = createRandom()
 
         await transporter.sendMail({
-                from: 'no-reply@esportimes.com',
-                to: mail,
-                subject: "Unknownpros OTP for registration is: ",
-                html: "<h3>OTP for account verification is </h3>" + "<h1 style='font-weight:bold;'>" + rand + "</h1>" // html body
-            });
+            from: 'no-reply@esportimes.com',
+            to: mail,
+            subject: "Unknownpros OTP for registration is: ",
+            html: "<h3>OTP for account verification is </h3>" + "<h1 style='font-weight:bold;'>" + rand + "</h1>" // html body
+        });
 
         await client.set(mail, "" + rand + "");
         client.expire(mail, 600); // setting expiry for 10 minutes.
 
-        return ''+rand+''
+        return '' + rand + ''
     }
-    catch(error){
+    catch (error) {
         throw error
     }
 
 }
 
 //otp yi reactta string gonder
-function verifyOtp(mail, otp , callback) {
-    try{
+function verifyOtp(mail, otp, callback) {
+    try {
         client.get(mail, function (err, value) {
             if (value === otp) {
-                callback(err , {code: value, status:1})
+                callback(err, { code: value, status: 1 })
             } else {
-                callback(err, {code: otp, status:0})
+                callback(err, { code: otp, status: 0 })
             }
-    
+
         });
     }
-    catch(error)
-    {
+    catch (error) {
         throw error
     }
 
