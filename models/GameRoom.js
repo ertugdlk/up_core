@@ -16,7 +16,6 @@ const GameRoomSchema = new Mongoose.Schema(
     },
     users: [{
         type: String,
-        default: []
     }],
     status: {
         type: String,

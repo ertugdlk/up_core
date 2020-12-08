@@ -98,16 +98,27 @@ class Websockets {
             }
         })
 
-        client.on("join",  (socketId, nickname) => {
-            //find gameroominfo with socket id and update userCount field
+        client.on("join",  (nickname, host) => {
+            try
+            {
+                //find GameRoom and update users array with nickname
+                const room = await GameRoom.findOneAndUpdate({host: host} , 
+                    {$push: {'users': nickname} 
+                })
+                await room.save()
 
-            //find GameRoom and update users array with nickname
+                //find gameroominfo with socket id and update userCount field
+                const roomInfo = await GameRoomInfo.findOne({host: host})
+                roomInfo.users = roomInfo.users + 1
+                await roomInfo.save()
 
-
-            //connect this socketId to gameroom's roomid
-            //client.to("socketId")
-
-            //send emit to react for game room component
+                //connect this socketId to gameroom's roomid
+                client.to(room.roomId)
+            }
+            catch(error)
+            {
+                throw error
+            }
         })
 
         client.on("close", () => {
