@@ -8,7 +8,7 @@ const _rcon = await Rcon.connect({
 })
 
 async function gameStatus(){
-    const response = await _rcon.send("get5_status")
+    const response = await Promise.all([_rcon.send("get5_status")])
     return response
 }
 
