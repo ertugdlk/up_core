@@ -1,7 +1,7 @@
-const rcon = require('rcon-client')
+const {Rcon} = require('rcon-client')
 const Config = require('config')
 
-const _rcon = await rcon.connect({
+const _rcon = await Rcon.connect({
     host: process.env.RCON_HOST,
     port: Config.get('rcon.port'),
     password: process.env.RCON_PASS
