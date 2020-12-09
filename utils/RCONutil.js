@@ -1,13 +1,25 @@
-const RCON = require('rcon-client')
+const {Rcon} = require('rcon-client')
 const Config = require('config')
 
-const rcon = await RCON.connect({
-    host: Config.get("rcon.host"),
+const _rcon = Rcon.connect({
+    host: process.env.RCON_HOST,
     port: Config.get('rcon.port'),
-    password: Config.get('rcon.password')
+    password: process.env.RCON_PASS
 })
 
 async function gameStatus(){
-    const response = await rcon.send("get5_status")
-    return response
+    try{
+        const rcon = new Rcon({ host: process.env.RCON_HOST, port: Config.get('rcon.port'), password: process.env.RCON_PASS })
+        await rcon.connect()
+        const response = await Promise.all([rcon.send("get5_status")])
+        return response
+    }
+    catch(error)
+    {
+        throw error
+    }
+}
+
+module.exports = {
+    gameStatus
 }

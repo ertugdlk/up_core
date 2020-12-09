@@ -2,6 +2,7 @@ const { createRoom, closeRoom, getRoom, getRooms } = require('./RedisUtil')
 const SocketUserBuilder = require('../models/builders/SocketUserBuilder')
 const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
+const moment = require('moment')
 const _ = require('lodash')
 var clients = []
 //bu array global mi
@@ -42,7 +43,7 @@ class Websockets {
         //Nickname cookie den mi çekilsin yoksa client mi göndersin
         //const cookies = cookie.parse(socket.request.headers.cookie || '');
 
-        client.on("login" , (data_nickname) => {
+        client.on("login" , async (data_nickname) => {
             try{
                 //check data nickname exist or not
                 console.log(data_nickname)
@@ -98,23 +99,34 @@ class Websockets {
             }
         })
 
-        client.on("join",  (socketId, nickname) => {
-            //find gameroominfo with socket id and update userCount field
+        client.on("join",  async (nickname, host) => {
+            try
+            {
+                //find GameRoom and update users array with nickname
+                const room = await GameRoom.findOneAndUpdate({host: host} , 
+                    {$push: {'users': nickname} 
+                })
+                await room.save()
 
-            //find GameRoom and update users array with nickname
+                //find gameroominfo with socket id and update userCount field
+                const roomInfo = await GameRoomInfo.findOne({host: host})
+                roomInfo.users = roomInfo.users + 1
+                await roomInfo.save()
 
-
-            //connect this socketId to gameroom's roomid
-            //client.to("socketId")
-
-            //send emit to react for game room component
+                //connect this socketId to gameroom's roomid
+                client.to(room.roomId)
+            }
+            catch(error)
+            {
+                throw error
+            }
         })
 
         client.on("close", () => {
             closeRoom(client.id)
         })
 
-        client.on('disconnect', () => {
+        client.on('disconnect', async () => {
             //Check running or waiting game room for user
             //if there is no exist game room just disconnect
             try{
