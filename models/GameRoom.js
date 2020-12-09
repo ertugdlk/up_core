@@ -24,7 +24,7 @@ const GameRoomSchema = new Mongoose.Schema(
     },
     createdAt: { type: Date, default: Date.now },
     expireAt: { type: Date, default: undefined },
-}, { versionKey: false })
+},  { versionKey: false })
 
 GameRoomSchema.index({ "expireAt": 1 }, { expireAfterSeconds: 0 });
 
