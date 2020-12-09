@@ -98,7 +98,7 @@ class Websockets {
             }
         })
 
-        client.on("join",  (nickname, host) => {
+        client.on("join",  async (nickname, host) => {
             try
             {
                 //find GameRoom and update users array with nickname
