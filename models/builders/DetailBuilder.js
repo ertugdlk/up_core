@@ -1,45 +1,41 @@
 const _ = require('lodash')
 
-class DetailBuilder
-{
-    constructor()
-    {
+class DetailBuilder {
+    constructor() {
         this.detail = {}
     }
 
-    id( id )
-    {
+    id(id) {
         this.detail.id = id
         return this
     }
 
-    name( name )
-    {
+    name(name) {
         this.detail.name = name
         return this
     }
 
-    uniqueID( uniqueID )
-    {
+    uniqueID(uniqueID) {
         this.detail.uniqueID = uniqueID
         return this
     }
 
-    user( user )
-    {
+    user(user) {
         this.detail.user = typeof user == 'object' ? user._id : user
         return this
     }
 
-    platform ( platform )
-    {
+    platform(platform) {
         this.detail.platform = typeof platform == 'object' ? platform._id : platform
         return this
     }
-  
 
-    build ()
-    {
+    avatar(avatar) {
+        this.detail.avatar = avatar
+        return this
+    }
+
+    build() {
         const clearedDetail = _.chain(this.detail)
 
         return clearedDetail
