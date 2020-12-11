@@ -27,7 +27,7 @@ async function deleteHostedRoom(data_nickname) {
     if (openedRoom) {
         //Exist game room => MongoDB keep this nickname 3-5 mins in game room data
         //Set expire date for created or hosted room
-        await GameRoom.update(openedRoom._id, { createdAt: {expires : moment().add(3, 'minutes')} })
+        await GameRoom.update(openedRoom._id, { expireAt: {expires : moment().add(3, 'minutes')} })
         //send emit to room with 3min close message
         
         client.emit('closeRoom', 3600)
@@ -87,10 +87,10 @@ class Websockets {
             }
         })
 
-        client.on("create", async (nickname, gameData) => {
+        client.on("create", async (gameData) => {
             try{
                 //check user in any room or not ?
-                const result = checkHostedRoom(nickname)
+                const result = checkHostedRoom(gameData.host)
                 if(result == true)
                 {
                     client.emit('Error', 'hosted_room')
@@ -116,6 +116,7 @@ class Websockets {
             }
         })
 
+        //join ve leave e gelen parametreleri bir objeye çevrilmeli mesaj iletilmiyor 
         client.on("join", async (nickname, host) => {
             try {
                 //find GameRoom and update users array with nickname
