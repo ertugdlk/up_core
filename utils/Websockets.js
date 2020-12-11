@@ -4,7 +4,6 @@ const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
 const moment = require('moment')
 const _ = require('lodash')
-const { findOneAndUpdate } = require('../models/GameRoom')
 var clients = []
 //bu array global mi
 
@@ -162,8 +161,8 @@ class Websockets {
             //if there is no exist game room just disconnect
             try {
                 //delete this client id from clients array
-                const user = _.find(clients, function (client) {
-                    return _.filter(client.sockets, client.id)
+                const user = _.find(clients, function (client_user) {
+                    return _.filter(client_user.sockets, client.id)
                 })
 
                 _.remove(user.sockets, function (socket) {
@@ -171,8 +170,8 @@ class Websockets {
                 })
 
                 if (user.sockets == []) {
-                    _.remove(clients, function (wclient) {
-                        return wclient.nickname == user.nickname
+                    _.remove(clients, function (client_user) {
+                        return client_user.nickname == user.nickname
                     })
                 }
 
