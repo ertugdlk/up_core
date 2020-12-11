@@ -37,6 +37,18 @@ async function deleteHostedRoom(data_nickname)
     }
 }
 
+async function checkHostedRoom(nickname)
+{
+    const hostedRoom = await GameRoom.findOne({host: nickname})
+    if(hostedRoom)
+    {
+        return true
+    }
+    else{
+        return false
+    }
+}
+
 class Websockets {
 
     connection(client) {
@@ -78,21 +90,29 @@ class Websockets {
             }
         })
 
-        client.on("create", async (gameData) => {
+        client.on("create", async (nickname, gameData) => {
             try{
-                //save room in MongoDB info and room
-                const gameInfo = new GameRoomInfo({room: client.id, name: gameData.name , type: gameData.type, host:gameData.host,  map: gameData.map, fee: gameData.fee, reward: gameData.fee*2, createdAt: gameData.createdAt})
-                const savedGameInfo = await gameInfo.save()
+                //check user in any room or not ?
+                const result = checkHostedRoom(nickname)
+                if(result == true)
+                {
+                    client.emit('Error', 'hosted_room')
+                }
+                else
+                {
+                    //save room in MongoDB info and room
+                    const gameInfo = new GameRoomInfo({room: client.id, name: gameData.name , type: gameData.type, host:gameData.host,  map: gameData.map, fee: gameData.fee, reward: gameData.fee*2, createdAt: gameData.createdAt})
+                    const savedGameInfo = await gameInfo.save()
 
-                const gameRoom = new GameRoom({roomId: client.id, roomInfo: savedGameInfo._id, host: gameData.host})
-                await gameRoom.save()
+                    const gameRoom = new GameRoom({roomId: client.id, roomInfo: savedGameInfo._id, host: gameData.host})
+                    await gameRoom.save()
 
-                //send client to room 
-                client.to(gameRoom.roomId)
+                    //send client to room 
+                    client.to(gameRoom.roomId)
 
-
-                //on every create send set new rooms for every socket
-                client.broadcast.emit('newRoom' , gameInfo)
+                    //on every create send set new rooms for every socket
+                    client.broadcast.emit('newRoom' , gameInfo)
+                }
             }
             catch(error){
                 throw error
