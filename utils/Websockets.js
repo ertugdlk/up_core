@@ -169,7 +169,7 @@ class Websockets {
                     return socket == client.id
                 })
 
-                if (user.sockets == []) {
+                if (user.sockets.length == 0) {
                     _.remove(clients, function (client_user) {
                         return client_user.nickname == user.nickname
                     })
