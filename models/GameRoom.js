@@ -26,6 +26,6 @@ const GameRoomSchema = new Mongoose.Schema(
     expireAt: { type: Date, default: undefined , expires: 180 },
 },  { versionKey: false })
 
-GameRoomSchema.index({ "expireAt": 1 }, { expireAfterSeconds: 180 });
+GameRoomSchema.index({ "expireAt": 1 }, { expireAfterSeconds: 0 });
 
 module.exports = Mongoose.model('GameRoom' , GameRoomSchema)
