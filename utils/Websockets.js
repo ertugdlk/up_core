@@ -30,6 +30,7 @@ async function deleteHostedRoom(data_nickname) {
         //Set expire date for created or hosted room
         await GameRoom.update(openedRoom._id, { expireAt: moment().add(3, 'minutes') })
         //send emit to room with 3min close message
+        
         client.emit('closeRoom', 3600)
     }
 }
