@@ -23,7 +23,7 @@ const GameRoomSchema = new Mongoose.Schema(
         default: 'waiting'
     },
     createdAt: { type: Date, default: Date.now },
-    expireAt: { type: Date, default: undefined },
+    expireAt: { type: Date, default: undefined , expires: 180 },
 },  { versionKey: false })
 
 GameRoomSchema.index({ "expireAt": 1 }, { expireAfterSeconds: 0 });

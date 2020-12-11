@@ -27,7 +27,8 @@ async function deleteHostedRoom(data_nickname) {
     if (openedRoom) {
         //Exist game room => MongoDB keep this nickname 3-5 mins in game room data
         //Set expire date for created or hosted room
-        await GameRoom.update(openedRoom._id, { expireAt: {expires : moment().add(3, 'minutes')} })
+        openedRoom.update
+        await GameRoom.updateOne({_id: openedRoom._id}, {$set: { expireAt: moment().add(3, 'minutes')} } )
         //send emit to room with 3min close message
         
         client.emit('closeRoom', 3600)
