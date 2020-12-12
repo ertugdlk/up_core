@@ -1,0 +1,41 @@
+{
+	"matchid": "",
+	"num_maps":1,
+	"players_per_team": 1,
+	"min_players_to_ready": 1,
+	"min_spectators_to_ready": 0,
+	"skip_veto": true,
+	"veto_first": "team1",
+	"side_type": "always_knife",
+
+	"spectators": {
+		"players":
+		[
+		]
+	},
+
+	"maplist":
+	[
+		"de_cache"
+	],
+
+	"team1": {
+		"name": "Team1",
+		"players":
+		[
+            "STEAM_0:1:52245092"
+        ]		
+	},
+
+	"team2": {
+		"name": "Team2",
+		"players":
+		[
+			"STEAM_1:1:46796472"
+		]
+	},
+
+	"cvars": {
+		"hostname": "Match server #1"
+	}
+}

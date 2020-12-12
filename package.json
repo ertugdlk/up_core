@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@node-steam/id": "^1.1.0",
     "bcrypt": "^5.0.0",
     "config": "^3.3.2",
     "easysoap": "2.2.0",

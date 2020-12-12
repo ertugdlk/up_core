@@ -1,5 +1,9 @@
 const {Rcon} = require('rcon-client')
 const Config = require('config')
+const steamid = require('@node-steam/id')
+var matchconfig = require('./matchconfig.json')
+const rcon = new Rcon({ host: process.env.RCON_HOST, port: Config.get('rcon.port'), password: process.env.RCON_PASS })
+
 
 const _rcon = Rcon.connect({
     host: process.env.RCON_HOST,
@@ -9,9 +13,9 @@ const _rcon = Rcon.connect({
 
 async function gameStatus(){
     try{
-        const rcon = new Rcon({ host: process.env.RCON_HOST, port: Config.get('rcon.port'), password: process.env.RCON_PASS })
         await rcon.connect()
         const response = await Promise.all([rcon.send("get5_status")])
+        rcon.end()
         return response
     }
     catch(error)
@@ -20,6 +24,37 @@ async function gameStatus(){
     }
 }
 
+async function createMatch(){
+    try
+    {
+        await rcon.connect()
+        const response = await Promise.all([rcon.send("get5_creatematch")])
+        rcon.end()
+    }
+    catch(error)
+    {
+        throw error
+    }
+}
+
+async function matchSettings(roomId , teams, map){
+
+    try
+    {
+        matchconfig.matchid = roomId
+        matchconfig.team1.players.push(teams[0])
+        matchconfig.team2.players.push(team[1])
+
+        return matchconfig
+    }
+    catch(error)
+    {
+        throw error
+    }
+}
+
 module.exports = {
-    gameStatus
+    gameStatus,
+    createMatch,
+    matchSettings
 }
