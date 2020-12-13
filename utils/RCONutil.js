@@ -73,5 +73,6 @@ async function matchSettings(roomId , teams, map){
 module.exports = {
     gameStatus,
     createMatch,
-    matchSettings
+    matchSettings,
+    setupMatch
 }
