@@ -104,8 +104,7 @@ class Websockets {
                     client.to(gameRoom.roomId)
 
                     //on every create send set new rooms for every socket
-                    global.io.local.emit('newRoom', gameData)
-                    //client.broadcast.emit('newRoom' , gameInfo)
+                    global.io.local.emit('newRoom', gameInfo)
                 }
             }
             catch (error) {
