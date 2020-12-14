@@ -11,7 +11,7 @@ async function findHostedRoomUpdate(data_nickname) {
     const hostedRoom = await GameRoom.findOne({ host: data_nickname })
     if (hostedRoom) {
         //if there was any room or operation Host by this user unset expire date for them
-        await GameRoom.update(hostedRoom._id, { $unset: { expireAt: 1 } })
+        await GameRoom.updateOne({_id: hostedRoom._id}, { $unset: { expireAt: 1 } })
     }
 }
 
