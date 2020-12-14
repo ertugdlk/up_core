@@ -40,7 +40,7 @@ async function createMatch(){
 async function setupMatch(roomId , teams , map){
     try
     {
-        const url = "http://localhost5000/rcon/matchconfig?roomId="+ roomId + "teams="+ teams[0]+ "teams=" + teams[1]
+        const url = "http://localhost:5000/rcon/matchconfig?roomId="+ roomId + "teams="+ teams[0]+ "teams=" + teams[1]
         await rcon.connect()
 
         const response = await Promise.all([rcon.send("get5_loadmatch_url" + '"'+url+'"')])
