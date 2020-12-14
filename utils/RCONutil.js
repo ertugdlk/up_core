@@ -40,10 +40,10 @@ async function createMatch(){
 async function setupMatch(roomId , teams , map){
     try
     {
-        const url = "http://localhost:5000/rcon/matchconfig?roomId="+ roomId + "&teams="+ teams[0]+ "&teams=" + teams[1]
+        const url = "https://98135b15f402.ngrok.io/rcon/matchconfig?roomId="+ roomId + "&teams="+ teams[0]+ "&teams=" + teams[1]
         await rcon.connect()
 
-        const response = await Promise.all([rcon.send("get5_loadmatch_url" + '"'+url+'"')])
+        const response = await Promise.all([rcon.send("get5_loadmatch_url" + ' "'+url+'"')])
         rcon.end()
         return response
 
@@ -60,7 +60,7 @@ async function matchSettings(roomId , teams, map){
     {
         matchconfig.matchid = roomId
         matchconfig.team1.players.push(teams[0])
-        matchconfig.team2.players.push(team[1])
+        matchconfig.team2.players.push(teams[1])
 
         return matchconfig
     }
