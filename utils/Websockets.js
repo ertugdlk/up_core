@@ -4,6 +4,7 @@ const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
 const moment = require('moment')
 const _ = require('lodash')
+const { findOneAndDelete } = require('../models/GameRoom')
 var clients = []
 //bu array global mi
 
@@ -109,6 +110,27 @@ class Websockets {
                 }
             }
             catch (error) {
+                throw error
+            }
+        })
+
+
+        client.on("delete", async (gameData) => {
+            try {
+                const result = checkHostedRoom(gameData.host)
+                if (result !== true) {
+                    client.emit('Error', 'room_does_not_exist')
+                }
+                else {
+                    GameRoomInfo.findOneAndDelete({ host: gameData.host })
+                    GameRoom.findOneAndDelete({ host: gameData.host })
+                    // io.sockets.clients(someRoom).forEach(function(s){
+                    //    s.leave(someRoom);
+                    //});
+
+                }
+
+            } catch (error) {
                 throw error
             }
         })
