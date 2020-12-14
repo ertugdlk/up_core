@@ -105,8 +105,7 @@ class Websockets {
                     client.to(gameRoom.roomId)
 
                     //on every create send set new rooms for every socket
-                    global.io.local.emit('newRoom', gameData)
-                    //client.broadcast.emit('newRoom' , gameInfo)
+                    global.io.local.emit('newRoom', gameInfo)
                 }
             }
             catch (error) {
@@ -159,17 +158,23 @@ class Websockets {
         })
 
         client.on("leave", async (data) => {
-            const room = await GameRoom.findOneAndUpdate({ host: data.host },
-                {
-                    $pull: { 'users': data.nickname }
-                })
-            await room.save()
-
-            const roomInfo = await GameRoomInfo.findOne({ host: data.host })
-            roomInfo.userCount -= 1
-            await roomInfo.save()
-            client.leave(room.roomId)
-            client.to(room.roomId).emit('leftMessage', data.nickname);
+            try{
+                const room = await GameRoom.findOneAndUpdate({ host: data.host },
+                    {
+                        $pull: { 'users': data.nickname }
+                    })
+                await room.save()
+    
+                const roomInfo = await GameRoomInfo.findOne({ host: data.host })
+                roomInfo.userCount -= 1
+                await roomInfo.save()
+                client.leave(room.roomId)
+                client.to(room.roomId).emit('leftMessage', data.nickname);
+            }
+            catch(error)
+            {
+                throw error
+            }
         })
 
         client.on("close", () => {
