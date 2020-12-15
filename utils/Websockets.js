@@ -4,7 +4,7 @@ const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
 const moment = require('moment')
 const _ = require('lodash')
-const { findOneAndDelete } = require('../models/GameRoom')
+const { findOneAndDelete, findOneAndUpdate } = require('../models/GameRoom')
 const Game = require('../models/Game')
 var clients = []
 //bu array global mi
@@ -169,6 +169,21 @@ class Websockets {
                 client.to(room.roomId)
             }
             catch (error) {
+                throw error
+            }
+        })
+
+        client.on('changeTeam', async (data) => {
+            try {
+                const gameroom = await GameRoom.findOne({ host: data.host })
+                gameroom.update({ 'users.nickname': data.nickname }, {
+                    '$set': {
+                        'users.$.team': data.team
+                    }
+                }, function (err) {
+                    throw err
+                })
+            } catch (error) {
                 throw error
             }
         })
