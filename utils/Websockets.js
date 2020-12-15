@@ -5,6 +5,7 @@ const GameRoomInfo = require('../models/GameRoomInfo')
 const moment = require('moment')
 const _ = require('lodash')
 const { findOneAndDelete } = require('../models/GameRoom')
+const Game = require('../models/Game')
 var clients = []
 //bu array global mi
 
@@ -12,7 +13,7 @@ async function findHostedRoomUpdate(data_nickname) {
     const hostedRoom = await GameRoom.findOne({ host: data_nickname })
     if (hostedRoom) {
         //if there was any room or operation Host by this user unset expire date for them
-        await GameRoom.updateOne({_id: hostedRoom._id}, { $unset: { expireAt: 1 } })
+        await GameRoom.updateOne({ _id: hostedRoom._id }, { $unset: { expireAt: 1 } })
     }
 }
 
@@ -90,15 +91,17 @@ class Websockets {
             try {
                 //check user in any room or not ?
                 const result = checkHostedRoom(gameData.host)
+
                 if (result == true) {
                     client.emit('Error', 'hosted_room')
                 }
                 else {
+                    let roomUsers = [{ host: gameData.host, team: 1 }]
                     //save room in MongoDB info and room
                     const gameInfo = new GameRoomInfo({ room: client.id, name: gameData.name, type: gameData.type, host: gameData.host, map: gameData.map, fee: gameData.fee, reward: gameData.fee * 2, createdAt: gameData.createdAt })
                     const savedGameInfo = await gameInfo.save()
 
-                    const gameRoom = new GameRoom({ roomId: client.id, roomInfo: savedGameInfo._id, host: gameData.host })
+                    const gameRoom = new GameRoom({ roomId: client.id, settings: { type: gameData.type, map: gameData.map }, users: roomUsers, roomInfo: savedGameInfo._id, host: gameData.host })
                     await gameRoom.save()
 
                     //send client to room 
@@ -137,12 +140,25 @@ class Websockets {
         //join ve leave e gelen parametreleri bir objeye çevrilmeli mesaj iletilmiyor 
         client.on("join", async (data) => {
             try {
-                //find GameRoom and update users array with nickname
-                const room = await GameRoom.findOneAndUpdate({ host: data.host },
-                    {
-                        $push: { 'users': data.nickname }
-                    })
+                const room = await GameRoom.findOne({ host: data.host })
+                let t;
+                if (room.users.team1 > room.users.team2) {
+                    t = 2;
+                    room.team2 += 1
+                } else {
+                    t = 1;
+                    room.team1 += 1
+                }
+                room.users.push({ nickname: data.nickname, team: t })
+
                 await room.save()
+
+                //find GameRoom and update users array with nickname
+                /*const room = await GameRoom.findOneAndUpdate({ host: data.host },
+                    {
+                        $push: { 'users': {nickname:data.nickname,team:}}
+                    })
+               */
 
                 //find gameroominfo with socket id and update userCount field
                 const roomInfo = await GameRoomInfo.findOne({ host: data.host })
@@ -158,21 +174,20 @@ class Websockets {
         })
 
         client.on("leave", async (data) => {
-            try{
+            try {
                 const room = await GameRoom.findOneAndUpdate({ host: data.host },
                     {
                         $pull: { 'users': data.nickname }
                     })
                 await room.save()
-    
+
                 const roomInfo = await GameRoomInfo.findOne({ host: data.host })
                 roomInfo.userCount -= 1
                 await roomInfo.save()
                 client.leave(room.roomId)
                 client.to(room.roomId).emit('leftMessage', data.nickname);
             }
-            catch(error)
-            {
+            catch (error) {
                 throw error
             }
         })
