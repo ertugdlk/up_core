@@ -21,7 +21,7 @@ const GameSettings = new Mongoose.Schema(
         type:{
             type:String
         }
-    }
+    }, { versionKey: false, _id: false }
 )
 
 const GameRoomSchema = new Mongoose.Schema(
