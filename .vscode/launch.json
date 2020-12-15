@@ -7,14 +7,14 @@
         {
             "type": "node",
             "request": "launch",
-            "runtimeVersion": "9.9.0",
+            "runtimeVersion": "12.18.3",
             "name": "Tests",
             "program": "${workspaceFolder}/node_modules/jest/bin/jest",
             "args": [
                 "--colors",
             ],
             "env": {
-                "NODE_ENV": "test"
+                "NODE_ENV": "test -- GameRoom.test.js "
             }
         }
     ]
