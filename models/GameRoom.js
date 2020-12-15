@@ -1,6 +1,29 @@
 const Mongoose = require('mongoose')
 const Schema   = Mongoose.Schema
 
+const roomUser = new Mongoose.Schema(
+    {
+        nickname:{
+            type: String,
+            required: true
+        },
+        team:{
+            type:Number
+        }
+    }, { versionKey: false, _id: false }
+)
+
+const GameSettings = new Mongoose.Schema(
+    {
+        map:{
+            type:String
+        },
+        type:{
+            type:String
+        }
+    }
+)
+
 const GameRoomSchema = new Mongoose.Schema(
 {
     roomId: {
@@ -12,11 +35,10 @@ const GameRoomSchema = new Mongoose.Schema(
     host:{
         type: String,
         unique: true,
-        require: true
+        required: true
     },
-    users: [{
-        type: String,
-    }],
+    users: [roomUser],
+    settings: GameSettings,
     status: {
         type: String,
         required: true,
