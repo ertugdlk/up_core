@@ -190,11 +190,20 @@ class Websockets {
 
         client.on("leave", async (data) => {
             try {
-                const room = await GameRoom.findOneAndUpdate({ host: data.host },
+                const room = await GameRoom.findOne({ host: data.host })
+                const user = _.find(room.users, { nickname: data.nickname })//find which user is leaving
+                const t = user.team //find users team (1 or 2)
+
+                if (t === 1) {
+                    await room.update({ team1: (room.team1 - 1) })
+                } else if (t === 2) {
+                    await room.update({ team1: (room.team2 - 1) })
+                }
+
+                await GameRoom.findOneAndUpdate({ host: data.host },
                     {
-                        $pull: { 'users': data.nickname }
+                        $pull: { 'users': data.nickname }//pull user out of the array
                     })
-                await room.save()
 
                 const roomInfo = await GameRoomInfo.findOne({ host: data.host })
                 roomInfo.userCount -= 1
