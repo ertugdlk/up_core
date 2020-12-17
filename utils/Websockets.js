@@ -1,4 +1,3 @@
-const { createRoom, closeRoom, getRoom, getRooms } = require('./RedisUtil')
 const SocketUserBuilder = require('../models/builders/SocketUserBuilder')
 const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
@@ -220,6 +219,10 @@ class Websockets {
             catch (error) {
                 throw error
             }
+        })
+
+        client.on('msg', async (msg) => {
+            console.log(msg)
         })
     }
 }

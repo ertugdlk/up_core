@@ -23,6 +23,8 @@
     "passport-steam": "^1.0.14",
     "rcon-client": "^4.2.3",
     "redis": "^3.0.2",
+    "socket.io": "^3.0.4",
+    "socket.io-client": "^3.0.4",
     "validator": "13.1.17"
   },
   "devDependencies": {
