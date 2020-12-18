@@ -119,8 +119,8 @@ class Websockets {
         client.on("message", async (data) => {
             try{
                 const room = await GameRoom.findOne({ host: data.host })
-                const messageObject = {nikcname: data.nickname , message: data.msg}
-                global.io.in(room.roomId).emit("message", (messageObject))
+                const messageObject = {nickname: data.nickname , message: data.msg}
+                global.io.local.emit("newMessage", (messageObject))
             }
             catch(error){
                 throw error
@@ -154,7 +154,7 @@ class Websockets {
             try {
                 const room = await GameRoom.findOne({ host: data.host })
                 let t;
-                if (room.users.team1 > room.users.team2) {
+                if (room.team1 > room.team2) {
                     t = 2;
                     room.team2 += 1
                 } else {
