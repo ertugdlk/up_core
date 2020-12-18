@@ -116,6 +116,14 @@ class Websockets {
         })
 
 
+        client.on("message", async (data) => {
+
+            const room = await GameRoom.findOne({ host: data.host })
+            client.to(room.roomId).emit("message", data.msg)
+
+        })
+
+
         client.on("delete", async (gameData) => {
             try {
                 const result = checkHostedRoom(gameData.host)
@@ -125,6 +133,7 @@ class Websockets {
                 else {
                     GameRoomInfo.findOneAndDelete({ host: gameData.host })
                     GameRoom.findOneAndDelete({ host: gameData.host })
+
                     // io.sockets.clients(someRoom).forEach(function(s){
                     //    s.leave(someRoom);
                     //});
