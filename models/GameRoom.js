@@ -56,6 +56,9 @@ const GameRoomSchema = new Mongoose.Schema(
             required: true,
             default: 'waiting'
         },
+        reward:{
+            type: String,
+        },
         createdAt: { type: Date, default: Date.now },
         expireAt: { type: Date, default: undefined, expires: 180 },
     }, { versionKey: false })

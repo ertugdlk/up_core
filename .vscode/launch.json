@@ -14,7 +14,7 @@
                 "--colors",
             ],
             "env": {
-                "NODE_ENV": "test -- GameRoom.test.js "
+                "NODE_ENV": "test -- Socket.test.js "
             }
         }
     ]
