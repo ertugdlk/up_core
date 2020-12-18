@@ -77,7 +77,7 @@ class Websockets {
                     user[0].sockets.push(client.id)
                     //Check User's operations and apply them to new connection
                     //Find roomId with nickname on MongoDB room table
-                    findOpenedRoomUpdate(client, data_nickname)
+                    //findOpenedRoomUpdate(client, data_nickname)
                 }
                 console.log(data_nickname + client.id + ' user connected')
             }
@@ -120,7 +120,7 @@ class Websockets {
             try{
                 const room = await GameRoom.findOne({ host: data.host })
                 const messageObject = {nikcname: data.nickname , message: data.msg}
-                client.to(room.roomId).emit("message", (messageObject))
+                global.io.in(room.roomId).emit("message", (messageObject))
             }
             catch(error){
                 throw error
