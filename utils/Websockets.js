@@ -181,6 +181,37 @@ class Websockets {
             }
         })
 
+
+        client.on("ready", async (data) => {
+            try {
+                const room = await GameRoom.findOne({ host: data.host })
+                const user = _.find(room.users, { nickname: data.nickname })//find which user is leaving
+                const ready = user.readyStatus
+
+                if (!ready) {
+                    room.update({ 'users.nickname': data.nickname }, {
+                        '$set': {
+                            'users.$.readyStatus': 1
+                        }
+                    }, function (err) {
+                        throw err
+                    })
+                } else {
+                    room.update({ 'users.nickname': data.nickname }, {
+                        '$set': {
+                            'users.$.readyStatus': 0
+                        }
+                    }, function (err) {
+                        throw err
+                    })
+                }
+
+            } catch (error) {
+                throw error
+            }
+        })
+
+
         client.on('changeTeam', async (data) => {
             try {
                 const gameroom = await GameRoom.findOne({ host: data.host })
