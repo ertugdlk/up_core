@@ -62,7 +62,7 @@ class Websockets {
                     //check user host in any opened room
                     findHostedRoomUpdate(data_nickname)
                     //if there was any room or operation Host by this user unset expire date for them
-                    findOpenedRoomUpdate(client, data_nickname)
+                    //findOpenedRoomUpdate(client, data_nickname)
 
                     const sockets = [client.id]
                     const newUserBuilder = new SocketUserBuilder()
