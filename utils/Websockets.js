@@ -117,10 +117,14 @@ class Websockets {
 
 
         client.on("message", async (data) => {
-
-            const room = await GameRoom.findOne({ host: data.host })
-            client.to(room.roomId).emit("message", data.msg)
-
+            try{
+                const room = await GameRoom.findOne({ host: data.host })
+                const messageObject = {nikcname: data.nickname , message: data.msg}
+                client.to(room.roomId).emit("message", (messageObject))
+            }
+            catch(error){
+                throw error
+            }
         })
 
 
