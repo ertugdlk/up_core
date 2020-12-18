@@ -188,7 +188,7 @@ class Websockets {
         client.on('changeTeam', async (data) => {
             try {
                 const gameroom = await GameRoom.findOne({ host: data.host })
-                gameroom.update({ 'users.nickname': data.nickname }, {
+                await gameroom.update({ 'users.nickname': data.nickname }, {
                     '$set': {
                         'users.$.team': data.team
                     }
