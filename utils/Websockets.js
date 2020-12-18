@@ -251,7 +251,7 @@ class Websockets {
                     })
                 }
 
-                deleteHostedRoom(user.nickname)
+                //deleteHostedRoom(user.nickname)
             }
             catch (error) {
                 throw error
