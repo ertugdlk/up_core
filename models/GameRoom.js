@@ -9,6 +9,10 @@ const roomUser = new Mongoose.Schema(
         },
         team: {
             type: Number
+        },
+        readyStatus: {
+            type: Boolean,
+            default: 0
         }
     }, { versionKey: false, _id: false }
 )
