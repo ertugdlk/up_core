@@ -167,13 +167,15 @@ class Websockets {
         client.on("join", async (data) => {
             try {
                 const joinedRoom = await checkJoinedRoom(data.nickname)
-                if(joinedRoom == true){
-                    client.emit('Error', 'exist_joined_room')
-                }
-
                 const room = await GameRoom.findOne({ host: data.host })
-                if(!room){
-                    client.emit('Error', 'room_does_not_exist')
+
+                if(!room || joinedRoom == true){
+                    if(joinedRoom == true){
+                        client.emit('Error', 'exist_joined_room')
+                    }
+                    else{
+                        client.emit('Error', 'room_does_not_exist')
+                    }
                 }
                 else{
                     let t;
