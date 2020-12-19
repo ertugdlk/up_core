@@ -102,10 +102,12 @@ class Websockets {
                     const savedGameInfo = await gameInfo.save()
 
                     const gameRoom = new GameRoom({ roomId: client.id, settings: { type: gameData.type, map: gameData.map }, team1: 1, users: roomUsers, roomInfo: savedGameInfo._id, host: gameData.host })
-                    await gameRoom.save()
+                    const savedRoom = await gameRoom.save()
 
                     //send client to room 
-                    client.to(gameRoom.roomId)
+                    client.join(gameRoom.roomId)
+
+                    client.emit('roomCreated' , savedRoom)
 
                     //on every create send set new rooms for every socket
                     global.io.local.emit('newRoom', gameInfo)
