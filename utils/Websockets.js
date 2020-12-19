@@ -17,7 +17,7 @@ async function findHostedRoomUpdate(data_nickname) {
 }
 
 async function findOpenedRoomUpdate(client, data_nickname) {
-    const openedRoom = await GameRoom.findOne({ users: data_nickname })
+    const openedRoom = await GameRoom.findOne({ users: {$elemMatch: {nickname: data_nickname}} })
     if (openedRoom) {
         client.to(openedRoom.roomId)
     }
@@ -62,7 +62,7 @@ class Websockets {
                     //check user host in any opened room
                     findHostedRoomUpdate(data_nickname)
                     //if there was any room or operation Host by this user unset expire date for them
-                    //findOpenedRoomUpdate(client, data_nickname)
+                    findOpenedRoomUpdate(client, data_nickname)
 
                     const sockets = [client.id]
                     const newUserBuilder = new SocketUserBuilder()
@@ -77,7 +77,7 @@ class Websockets {
                     user[0].sockets.push(client.id)
                     //Check User's operations and apply them to new connection
                     //Find roomId with nickname on MongoDB room table
-                    //findOpenedRoomUpdate(client, data_nickname)
+                    findOpenedRoomUpdate(client, data_nickname)
                 }
                 console.log(data_nickname + client.id + ' user connected')
             }
