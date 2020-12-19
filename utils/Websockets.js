@@ -13,6 +13,7 @@ async function findHostedRoomUpdate(client, data_nickname) {
     if (hostedRoom) {
         //if there was any room or operation Host by this user unset expire date for them
         await GameRoom.updateOne({ _id: hostedRoom._id }, { $unset: { expireAt: 1 } })
+        client.emit("openedRoom", (hostedRoom))
         client.join(hostedRoom.roomId)
     }
 }
@@ -20,6 +21,7 @@ async function findHostedRoomUpdate(client, data_nickname) {
 async function findOpenedRoomUpdate(client, data_nickname) {
     const openedRoom = await GameRoom.findOne({ users: {$elemMatch: {nickname: data_nickname}} })
     if (openedRoom) {
+        client.emit("openedRoom", (openedRoom))
         client.join(openedRoom.roomId)
     }
 }
@@ -42,6 +44,17 @@ async function checkHostedRoom(nickname) {
         return true
     }
     else {
+        return false
+    }
+}
+
+async function checkJoinedRoom(nickname) {
+    const joinedRoom = await GameRoom.findOne({ users: {$elemMatch: {nickname: nickname}} })
+    if(joinedRoom)
+    {
+        return true
+    }
+    else{
         return false
     }
 }
@@ -90,10 +103,10 @@ class Websockets {
         client.on("create", async (gameData) => {
             try {
                 //check user in any room or not ?
-                const result = checkHostedRoom(gameData.host)
+                const result = await checkHostedRoom(gameData.host)
 
                 if (result == true) {
-                    client.emit('Error', 'hosted_room')
+                    client.emit('Error', 'exist hoted_room')
                 }
                 else {
                     let roomUsers = [{ nickname: gameData.host, team: 1 }]
@@ -102,10 +115,12 @@ class Websockets {
                     const savedGameInfo = await gameInfo.save()
 
                     const gameRoom = new GameRoom({ roomId: client.id, settings: { type: gameData.type, map: gameData.map }, team1: 1, users: roomUsers, roomInfo: savedGameInfo._id, host: gameData.host })
-                    await gameRoom.save()
+                    const savedRoom = await gameRoom.save()
 
                     //send client to room 
-                    client.to(gameRoom.roomId)
+                    client.join(gameRoom.roomId)
+
+                    client.emit('roomCreated' , savedRoom)
 
                     //on every create send set new rooms for every socket
                     global.io.local.emit('newRoom', gameInfo)
@@ -153,9 +168,16 @@ class Websockets {
         //join ve leave e gelen parametreleri bir objeye çevrilmeli mesaj iletilmiyor 
         client.on("join", async (data) => {
             try {
+                const joinedRoom = await checkJoinedRoom(data.nickname)
                 const room = await GameRoom.findOne({ host: data.host })
-                if(!room){
-                    client.emit('Error', 'room_does_not_exist')
+
+                if(!room || joinedRoom == true){
+                    if(joinedRoom == true){
+                        client.emit('Error', 'exist_joined_room')
+                    }
+                    else{
+                        client.emit('Error', 'room_does_not_exist')
+                    }
                 }
                 else{
                     let t;
@@ -217,13 +239,26 @@ class Websockets {
         client.on('changeTeam', async (data) => {
             try {
                 const gameroom = await GameRoom.findOne({ host: data.host })
-                await gameroom.update({ 'users.nickname': data.nickname }, {
-                    '$set': {
-                        'users.$.team': data.team
-                    }
-                }, function (err) {
-                    throw err
+
+                const user = _.find(gameroom.users , (user) => {
+                    return user.nickname == data.nickname
                 })
+
+                var newTeam;
+                if(user.team == 1){
+                    newTeam = 2
+                }
+                else{
+                    newTeam = 1
+                }
+
+                
+                await GameRoom.updateOne({_id: gameroom._id, 'users.nickname': data.nickname }, 
+                    { "$set": { "users.$.team": newTeam}})
+
+                const changedMember = {nickname: data.nickname, newTeam: newTeam, oldTeam: user.team}
+                global.io.in(gameroom.roomId).emit("teamChange", (changedMember))
+
             } catch (error) {
                 throw error
             }
