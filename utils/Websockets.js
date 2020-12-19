@@ -239,13 +239,30 @@ class Websockets {
         client.on('changeTeam', async (data) => {
             try {
                 const gameroom = await GameRoom.findOne({ host: data.host })
+
+                const user = _.find(gameroom.users , (user) => {
+                    return user.nickname == data.nickname
+                })
+
+                var newTeam;
+                if(user.team == 1){
+                    newTeam = 2
+                }
+                else{
+                    newTeam = 1
+                }
+
                 await gameroom.update({ 'users.nickname': data.nickname }, {
                     '$set': {
-                        'users.$.team': data.team
+                        'users.$.team': newTeam
                     }
                 }, function (err) {
                     throw err
                 })
+
+                const changedMember = {nickname: data.nickname, newTeam: newTeam, oldTeam: user.team}
+                global.io.in(gameroom.roomId).emit("teamChange", (changedMember))
+
             } catch (error) {
                 throw error
             }
