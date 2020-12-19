@@ -90,10 +90,10 @@ class Websockets {
         client.on("create", async (gameData) => {
             try {
                 //check user in any room or not ?
-                const result = checkHostedRoom(gameData.host)
+                const result = await checkHostedRoom(gameData.host)
 
                 if (result == true) {
-                    client.emit('Error', 'hosted_room')
+                    client.emit('Error', 'exist hoted_room')
                 }
                 else {
                     let roomUsers = [{ nickname: gameData.host, team: 1 }]
