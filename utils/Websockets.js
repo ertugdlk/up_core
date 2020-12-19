@@ -8,18 +8,19 @@ const Game = require('../models/Game')
 var clients = []
 //bu array global mi
 
-async function findHostedRoomUpdate(data_nickname) {
+async function findHostedRoomUpdate(client, data_nickname) {
     const hostedRoom = await GameRoom.findOne({ host: data_nickname })
     if (hostedRoom) {
         //if there was any room or operation Host by this user unset expire date for them
         await GameRoom.updateOne({ _id: hostedRoom._id }, { $unset: { expireAt: 1 } })
+        client.join(hostedRoom.roomId)
     }
 }
 
 async function findOpenedRoomUpdate(client, data_nickname) {
-    const openedRoom = await GameRoom.findOne({ users: data_nickname })
+    const openedRoom = await GameRoom.findOne({ users: {$elemMatch: {nickname: data_nickname}} })
     if (openedRoom) {
-        client.to(openedRoom.roomId)
+        client.join(openedRoom.roomId)
     }
 }
 
@@ -60,7 +61,7 @@ class Websockets {
                 console.log(user[0])
                 if (!user[0]) {
                     //check user host in any opened room
-                    findHostedRoomUpdate(data_nickname)
+                    findHostedRoomUpdate(client, data_nickname)
                     //if there was any room or operation Host by this user unset expire date for them
                     findOpenedRoomUpdate(client, data_nickname)
 
@@ -95,12 +96,12 @@ class Websockets {
                     client.emit('Error', 'hosted_room')
                 }
                 else {
-                    let roomUsers = [{ host: gameData.host, team: 1 }]
+                    let roomUsers = [{ nickname: gameData.host, team: 1 }]
                     //save room in MongoDB info and room
                     const gameInfo = new GameRoomInfo({ room: client.id, name: gameData.name, type: gameData.type, host: gameData.host, map: gameData.map, fee: gameData.fee, reward: gameData.fee * 2, createdAt: gameData.createdAt })
                     const savedGameInfo = await gameInfo.save()
 
-                    const gameRoom = new GameRoom({ roomId: client.id, settings: { type: gameData.type, map: gameData.map }, users: roomUsers, roomInfo: savedGameInfo._id, host: gameData.host })
+                    const gameRoom = new GameRoom({ roomId: client.id, settings: { type: gameData.type, map: gameData.map }, team1: 1, users: roomUsers, roomInfo: savedGameInfo._id, host: gameData.host })
                     await gameRoom.save()
 
                     //send client to room 
@@ -119,8 +120,8 @@ class Websockets {
         client.on("message", async (data) => {
             try{
                 const room = await GameRoom.findOne({ host: data.host })
-                const messageObject = {nikcname: data.nickname , message: data.msg}
-                client.to(room.roomId).emit("message", (messageObject))
+                const messageObject = {nickname: data.nickname , message: data.msg}
+                global.io.in(room.roomId).emit("newMessage", (messageObject))
             }
             catch(error){
                 throw error
@@ -153,32 +154,29 @@ class Websockets {
         client.on("join", async (data) => {
             try {
                 const room = await GameRoom.findOne({ host: data.host })
-                let t;
-                if (room.users.team1 > room.users.team2) {
-                    t = 2;
-                    room.team2 += 1
-                } else {
-                    t = 1;
-                    room.team1 += 1
+                if(!room){
+                    client.emit('Error', 'room_does_not_exist')
                 }
-                room.users.push({ nickname: data.nickname, team: t })
+                else{
+                    let t;
+                    if (room.team1 > room.team2) {
+                        t = 2;
+                        room.team2 += 1
+                    } else {
+                        t = 1;
+                        room.team1 += 1
+                    }
+                    room.users.push({ nickname: data.nickname, team: t })
 
-                await room.save()
+                    const savedRoom = await room.save()
+                    const roomInfo = await GameRoomInfo.findOne({ host: data.host })
+                    roomInfo.userCount = roomInfo.userCount + 1
+                    await roomInfo.save()
 
-                //find GameRoom and update users array with nickname
-                /*const room = await GameRoom.findOneAndUpdate({ host: data.host },
-                    {
-                        $push: { 'users': {nickname:data.nickname,team:}}
-                    })
-               */
-
-                //find gameroominfo with socket id and update userCount field
-                const roomInfo = await GameRoomInfo.findOne({ host: data.host })
-                roomInfo.userCount = roomInfo.userCount + 1
-                await roomInfo.save()
-
-                //connect this socketId to gameroom's roomid
-                client.to(room.roomId)
+                    //connect this socketId to gameroom's roomid
+                    client.join(room.roomId)
+                    client.emit("roomData", (savedRoom))
+                }
             }
             catch (error) {
                 throw error
@@ -260,7 +258,7 @@ class Websockets {
         })
 
         client.on("close", () => {
-            closeRoom(client.id)
+            //closeRoom(client.id)
         })
 
         client.on('disconnect', async () => {
@@ -282,15 +280,11 @@ class Websockets {
                     })
                 }
 
-                deleteHostedRoom(user.nickname)
+                //deleteHostedRoom(user.nickname)
             }
             catch (error) {
                 throw error
             }
-        })
-
-        client.on('msg', async (msg) => {
-            console.log(msg)
         })
     }
 }
