@@ -46,6 +46,17 @@ async function checkHostedRoom(nickname) {
     }
 }
 
+async function checkJoinedRoom(nickname) {
+    const joinedRoom = await GameRoom.findOne({ users: {$elemMatch: {nickname: nickname}} })
+    if(joinedRoom)
+    {
+        return true
+    }
+    else{
+        return false
+    }
+}
+
 class Websockets {
 
     connection(client) {
@@ -155,6 +166,11 @@ class Websockets {
         //join ve leave e gelen parametreleri bir objeye çevrilmeli mesaj iletilmiyor 
         client.on("join", async (data) => {
             try {
+                const joinedRoom = await checkJoinedRoom(data.nickname)
+                if(joinedRoom == true){
+                    client.emit('Error', 'exist_joined_room')
+                }
+
                 const room = await GameRoom.findOne({ host: data.host })
                 if(!room){
                     client.emit('Error', 'room_does_not_exist')
