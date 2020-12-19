@@ -8,7 +8,7 @@ const Game = require('../models/Game')
 var clients = []
 //bu array global mi
 
-async function findHostedRoomUpdate(data_nickname) {
+async function findHostedRoomUpdate(client, data_nickname) {
     const hostedRoom = await GameRoom.findOne({ host: data_nickname })
     if (hostedRoom) {
         //if there was any room or operation Host by this user unset expire date for them
@@ -61,7 +61,7 @@ class Websockets {
                 console.log(user[0])
                 if (!user[0]) {
                     //check user host in any opened room
-                    findHostedRoomUpdate(data_nickname)
+                    findHostedRoomUpdate(client, data_nickname)
                     //if there was any room or operation Host by this user unset expire date for them
                     findOpenedRoomUpdate(client, data_nickname)
 
