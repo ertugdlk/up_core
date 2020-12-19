@@ -234,6 +234,7 @@ class Websockets {
                     const updatedRoom = await GameRoom.findOne({_id: room._id})
                     updatedRoom.readyCount -= 1
                     await updatedRoom.save()
+                    global.io.in(room.roomId).emit("GameReadyStatus", ('not_ready'))
                     global.io.in(room.roomId).emit("readyChange", (changedMember))
                 }
             } catch (error) {
