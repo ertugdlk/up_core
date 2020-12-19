@@ -101,7 +101,7 @@ class Websockets {
                     const gameInfo = new GameRoomInfo({ room: client.id, name: gameData.name, type: gameData.type, host: gameData.host, map: gameData.map, fee: gameData.fee, reward: gameData.fee * 2, createdAt: gameData.createdAt })
                     const savedGameInfo = await gameInfo.save()
 
-                    const gameRoom = new GameRoom({ roomId: client.id, settings: { type: gameData.type, map: gameData.map }, users: roomUsers, roomInfo: savedGameInfo._id, host: gameData.host })
+                    const gameRoom = new GameRoom({ roomId: client.id, settings: { type: gameData.type, map: gameData.map }, team1: 1, users: roomUsers, roomInfo: savedGameInfo._id, host: gameData.host })
                     await gameRoom.save()
 
                     //send client to room 
@@ -182,6 +182,37 @@ class Websockets {
                 throw error
             }
         })
+
+
+        client.on("ready", async (data) => {
+            try {
+                const room = await GameRoom.findOne({ host: data.host })
+                const user = _.find(room.users, { nickname: data.nickname })//find which user is leaving
+                const ready = user.readyStatus
+
+                if (!ready) {
+                    room.update({ 'users.nickname': data.nickname }, {
+                        '$set': {
+                            'users.$.readyStatus': 1
+                        }
+                    }, function (err) {
+                        throw err
+                    })
+                } else {
+                    room.update({ 'users.nickname': data.nickname }, {
+                        '$set': {
+                            'users.$.readyStatus': 0
+                        }
+                    }, function (err) {
+                        throw err
+                    })
+                }
+
+            } catch (error) {
+                throw error
+            }
+        })
+
 
         client.on('changeTeam', async (data) => {
             try {
