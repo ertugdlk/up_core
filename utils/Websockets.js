@@ -109,7 +109,7 @@ class Websockets {
                     client.emit('Error', 'exist hoted_room')
                 }
                 else {
-                    let roomUsers = [{ nickname: gameData.host, team: 1 }]
+                    let roomUsers = [{ nickname: gameData.host, team: 1 , readyStatus: 1}]
                     //save room in MongoDB info and room
                     const gameInfo = new GameRoomInfo({ room: client.id, name: gameData.name, type: gameData.type, host: gameData.host, map: gameData.map, fee: gameData.fee, reward: gameData.fee * 2, createdAt: gameData.createdAt })
                     const savedGameInfo = await gameInfo.save()
