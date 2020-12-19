@@ -153,32 +153,37 @@ class Websockets {
         client.on("join", async (data) => {
             try {
                 const room = await GameRoom.findOne({ host: data.host })
-                let t;
-                if (room.team1 > room.team2) {
-                    t = 2;
-                    room.team2 += 1
-                } else {
-                    t = 1;
-                    room.team1 += 1
+                if(!room){
+                    client.emit('Error', 'room_does_not_exist')
                 }
-                room.users.push({ nickname: data.nickname, team: t })
+                else{
+                    let t;
+                    if (room.team1 > room.team2) {
+                        t = 2;
+                        room.team2 += 1
+                    } else {
+                        t = 1;
+                        room.team1 += 1
+                    }
+                    room.users.push({ nickname: data.nickname, team: t })
 
-                await room.save()
+                    await room.save()
 
-                //find GameRoom and update users array with nickname
-                /*const room = await GameRoom.findOneAndUpdate({ host: data.host },
-                    {
-                        $push: { 'users': {nickname:data.nickname,team:}}
-                    })
-               */
+                    //find GameRoom and update users array with nickname
+                    /*const room = await GameRoom.findOneAndUpdate({ host: data.host },
+                        {
+                            $push: { 'users': {nickname:data.nickname,team:}}
+                        })
+                */
 
-                //find gameroominfo with socket id and update userCount field
-                const roomInfo = await GameRoomInfo.findOne({ host: data.host })
-                roomInfo.userCount = roomInfo.userCount + 1
-                await roomInfo.save()
+                    //find gameroominfo with socket id and update userCount field
+                    const roomInfo = await GameRoomInfo.findOne({ host: data.host })
+                    roomInfo.userCount = roomInfo.userCount + 1
+                    await roomInfo.save()
 
-                //connect this socketId to gameroom's roomid
-                client.to(room.roomId)
+                    //connect this socketId to gameroom's roomid
+                    client.to(room.roomId)
+                }
             }
             catch (error) {
                 throw error
