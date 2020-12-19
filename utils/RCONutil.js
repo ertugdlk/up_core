@@ -37,7 +37,7 @@ async function createMatch(){
 async function setupMatch(host){
     try
     {
-        const url = "https://98135b15f402.ngrok.io/rcon/matchconfig?host="+ host
+        const url = "http://localhost:5000/rcon/matchconfig?host="+ host
         await rcon.connect()
 
         const response = await Promise.all([rcon.send("get5_loadmatch_url" + ' "'+url+'"')])

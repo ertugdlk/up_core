@@ -2,6 +2,7 @@ const SocketUserBuilder = require('../models/builders/SocketUserBuilder')
 const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
 const moment = require('moment')
+const {createMatch, setupMatch} = require('../utils/RCONutil')
 const _ = require('lodash')
 const { findOneAndDelete, findOneAndUpdate } = require('../models/GameRoom')
 const Game = require('../models/Game')
@@ -242,6 +243,17 @@ class Websockets {
             }
         })
 
+        client.on('countdown', async(data) => {
+            try{
+                const gameRoom = await GameRoom.findOne({host: data.host})
+                const returnData = {msg: 'Game is starting...'}
+                global.io.in(gameRoom.roomId).emit("countdownStart", (returnData))
+            }
+            catch(error)
+            {
+                throw error
+            }
+        })
 
         client.on('changeTeam', async (data) => {
             try {
