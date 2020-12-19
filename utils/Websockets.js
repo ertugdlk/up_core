@@ -121,7 +121,7 @@ class Websockets {
             try{
                 const room = await GameRoom.findOne({ host: data.host })
                 const messageObject = {nickname: data.nickname , message: data.msg}
-                global.io.local.emit("newMessage", (messageObject))
+                global.io.in(room.roomId).emit("newMessage", (messageObject))
             }
             catch(error){
                 throw error
@@ -235,7 +235,7 @@ class Websockets {
         })
 
         client.on("close", () => {
-            closeRoom(client.id)
+            //closeRoom(client.id)
         })
 
         client.on('disconnect', async () => {
@@ -262,10 +262,6 @@ class Websockets {
             catch (error) {
                 throw error
             }
-        })
-
-        client.on('msg', async (msg) => {
-            console.log(msg)
         })
     }
 }
