@@ -13,13 +13,14 @@ async function findHostedRoomUpdate(data_nickname) {
     if (hostedRoom) {
         //if there was any room or operation Host by this user unset expire date for them
         await GameRoom.updateOne({ _id: hostedRoom._id }, { $unset: { expireAt: 1 } })
+        client.join(openedRoom.roomId)
     }
 }
 
 async function findOpenedRoomUpdate(client, data_nickname) {
     const openedRoom = await GameRoom.findOne({ users: {$elemMatch: {nickname: data_nickname}} })
     if (openedRoom) {
-        client.to(openedRoom.roomId)
+        client.join(openedRoom.roomId)
     }
 }
 
@@ -168,8 +169,14 @@ class Websockets {
                     room.users.push({ nickname: data.nickname, team: t })
 
                     await room.save()
+                    const roomInfo = await GameRoomInfo.findOne({ host: data.host })
+                    roomInfo.userCount = roomInfo.userCount + 1
+                    await roomInfo.save()
 
-                    //find GameRoom and update users array with nickname
+                    //connect this socketId to gameroom's roomid
+                    client.join(room.roomId)
+
+                                        //find GameRoom and update users array with nickname
                     /*const room = await GameRoom.findOneAndUpdate({ host: data.host },
                         {
                             $push: { 'users': {nickname:data.nickname,team:}}
@@ -177,12 +184,6 @@ class Websockets {
                 */
 
                     //find gameroominfo with socket id and update userCount field
-                    const roomInfo = await GameRoomInfo.findOne({ host: data.host })
-                    roomInfo.userCount = roomInfo.userCount + 1
-                    await roomInfo.save()
-
-                    //connect this socketId to gameroom's roomid
-                    client.to(room.roomId)
                 }
             }
             catch (error) {
