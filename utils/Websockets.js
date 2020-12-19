@@ -198,6 +198,7 @@ class Websockets {
                     //connect this socketId to gameroom's roomid
                     client.join(room.roomId)
                     client.emit("roomData", (savedRoom))
+                    global.io.in(room.roomId).emit("newUserJoined", ({nickname: data.nickname, team: t, readyStatus: 0}))
                 }
             }
             catch (error) {
