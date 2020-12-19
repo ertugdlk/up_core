@@ -13,7 +13,7 @@ async function findHostedRoomUpdate(client, data_nickname) {
     if (hostedRoom) {
         //if there was any room or operation Host by this user unset expire date for them
         await GameRoom.updateOne({ _id: hostedRoom._id }, { $unset: { expireAt: 1 } })
-        client.emit("openedRoom", (hostedRoom))
+        client.emit("openedRoom", ({room: hostedRoom, nickname: data_nickname}))
         client.join(hostedRoom.roomId)
     }
 }
@@ -21,7 +21,7 @@ async function findHostedRoomUpdate(client, data_nickname) {
 async function findOpenedRoomUpdate(client, data_nickname) {
     const openedRoom = await GameRoom.findOne({ users: {$elemMatch: {nickname: data_nickname}} })
     if (openedRoom) {
-        client.emit("openedRoom", (openedRoom))
+        client.emit("openedRoom", ({room: openedRoom, nickname: data_nickname}))
         client.join(openedRoom.roomId)
     }
 }
