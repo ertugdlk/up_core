@@ -56,6 +56,10 @@ const GameRoomSchema = new Mongoose.Schema(
             required: true,
             default: 'waiting'
         },
+        readyCount: {
+            type: Number,
+            default: 1
+        },
         reward:{
             type: Number,
         },

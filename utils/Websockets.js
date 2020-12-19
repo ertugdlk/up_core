@@ -213,10 +213,15 @@ class Websockets {
                 const ready = user.readyStatus
 
                 if (!ready) {
-                    const updated = await GameRoom.updateOne({_id: room._id, 'users.nickname': data.nickname }, 
+                    await GameRoom.updateOne({_id: room._id, 'users.nickname': data.nickname }, 
                     { "$set": { "users.$.readyStatus": 1}})
                     const changedMember = {nickname: data.nickname}
-                    console.log(updated)
+                    const updatedRoom = await GameRoom.findOne({_id: room._id})
+                    const roomUserLimit = parseInt(updatedRoom.settings.type.charAt(0)) * 2
+                    if(updatedRoom.readyCount == roomUserLimit)
+                    {
+                        global.io.in(room.roomId).emit("GameReadyStatus", ('all_ready'))
+                    }
                     global.io.in(room.roomId).emit("readyChange", (changedMember))
                 } else {
                     await GameRoom.updateOne({_id: room._id, 'users.nickname': data.nickname }, 
