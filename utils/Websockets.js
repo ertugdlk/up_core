@@ -252,13 +252,9 @@ class Websockets {
                     newTeam = 1
                 }
 
-                await gameroom.update({ 'users.nickname': data.nickname }, {
-                    '$set': {
-                        'users.$.team': newTeam
-                    }
-                }, function (err) {
-                    throw err
-                })
+                
+                await GameRoom.updateOne({_id: gameroom._id, 'users.nickname': data.nickname }, 
+                    { "$set": { "users.$.team": newTeam}})
 
                 const changedMember = {nickname: data.nickname, newTeam: newTeam, oldTeam: user.team}
                 global.io.in(gameroom.roomId).emit("teamChange", (changedMember))
