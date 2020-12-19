@@ -207,6 +207,7 @@ class Websockets {
         })
 
 
+
         client.on("ready", async (data) => {
             try {
                 const room = await GameRoom.findOne({ host: data.host })
@@ -230,6 +231,9 @@ class Websockets {
                     await GameRoom.updateOne({_id: room._id, 'users.nickname': data.nickname }, 
                     { "$set": { "users.$.readyStatus": 0}})
                     const changedMember = {nickname: data.nickname}
+                    const updatedRoom = await GameRoom.findOne({_id: room._id})
+                    updatedRoom.readyCount -= 1
+                    await updatedRoom.save()
                     global.io.in(room.roomId).emit("readyChange", (changedMember))
                 }
             } catch (error) {
