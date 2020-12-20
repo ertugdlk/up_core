@@ -86,7 +86,7 @@ async function matchSettings(host){
         matchconfig.players_per_team = team1.length
         matchconfig.min_players_to_ready = team1.length * 2
         matchconfig.cvars.hostname = "Unknownpros" + host
-        
+        console.log(matchconfig)
         return matchconfig
     }
     catch(error)
