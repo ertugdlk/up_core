@@ -171,10 +171,15 @@ class Websockets {
             try {
                 const joinedRoom = await checkJoinedRoom(data.nickname)
                 const room = await GameRoom.findOne({ host: data.host })
+                const roomUserLimit = parseInt(room.settings.type.charAt(0)) * 2
 
-                if(!room || joinedRoom == true){
+                if(!room || joinedRoom == true || room.users.length == roomUserLimit){
                     if(joinedRoom == true){
                         client.emit('Error', 'exist_joined_room')
+                    }
+                    else if( room.users.length == roomUserLimit)
+                    {
+                        client.emit('Error', 'room_is_full')
                     }
                     else{
                         client.emit('Error', 'room_does_not_exist')
