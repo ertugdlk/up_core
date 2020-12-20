@@ -8,7 +8,6 @@ const _ = require('lodash')
 
 var matchconfig = require('./matchconfig.json')
 const rcon = new Rcon({ host: process.env.RCON_HOST, port: Config.get('rcon.port'), password: process.env.RCON_PASS })
-rcon.connect()
 
 async function gameStatus(){
     try{
@@ -35,10 +34,11 @@ async function createMatch(){
 async function setupMatch(host){
     try
     {
+        await rcon.connect()
         const url = "https://test.unknownpros.com/rcon/matchconfig?host="+ host
         const response = await Promise.all([rcon.send("get5_loadmatch_url" + ' "'+url+'"')])
+        rcon.end()
         return response
-
     }
     catch(error)
     {
@@ -86,7 +86,7 @@ async function matchSettings(host){
         matchconfig.players_per_team = team1.length
         matchconfig.min_players_to_ready = team1.length * 2
         matchconfig.cvars.hostname = "Unknownpros" + host
-        console.log(matchconfig)
+
         return matchconfig
     }
     catch(error)
