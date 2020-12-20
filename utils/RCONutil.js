@@ -5,17 +5,14 @@ const GameRoom = require('../models/GameRoom')
 const Detail = require('../models/Detail')
 const User = require('../models/User')
 const _ = require('lodash')
-const steamid = require('@node-steam/id')
 
 var matchconfig = require('./matchconfig.json')
 const rcon = new Rcon({ host: process.env.RCON_HOST, port: Config.get('rcon.port'), password: process.env.RCON_PASS })
-
+rcon.connect()
 
 async function gameStatus(){
     try{
-        await rcon.connect()
         const response = await Promise.all([rcon.send("get5_status")])
-        rcon.end()
         return response
     }
     catch(error)
@@ -27,9 +24,7 @@ async function gameStatus(){
 async function createMatch(){
     try
     {
-        await rcon.connect()
         const response = await Promise.all([rcon.send("get5_creatematch")])
-        rcon.end()
     }
     catch(error)
     {
@@ -41,10 +36,7 @@ async function setupMatch(host){
     try
     {
         const url = "http://localhost:5000/rcon/matchconfig?host="+ host
-        await rcon.connect()
-
         const response = await Promise.all([rcon.send("get5_loadmatch_url" + ' "'+url+'"')])
-        rcon.end()
         return response
 
     }
@@ -69,7 +61,7 @@ async function matchSettings(host){
         var gameteam1 = [];
         var gameteam2 = [];
 
-        team1.map( (member) => {
+        team1.map( async(member) => {
             const user = await User.findOne({ nickname: member.nickname})
             const detail = await Detail.findOne({user: user._id, platform: '5f9a84fca1f0c0b83de7d696'})
             const newId = new steamid.ID(detail.uniqueID)
@@ -78,7 +70,7 @@ async function matchSettings(host){
         })
 
 
-        team2.map( (member) => {
+        team2.map( async (member) => {
             const user = await User.findOne({ nickname: member.nickname})
             const detail = await Detail.findOne({user: user._id, platform: '5f9a84fca1f0c0b83de7d696'})
             const newId = new steamid.ID(detail.uniqueID)
