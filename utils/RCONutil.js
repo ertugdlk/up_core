@@ -23,7 +23,6 @@ async function gameStatus(){
 async function createMatch(){
     try
     {
-        await rcon.connect()
         const response = await Promise.all([rcon.send("get5_creatematch")])
         await rcon.end()
     }
@@ -39,7 +38,6 @@ async function setupMatch(host){
         await rcon.connect()
         const url = "https://test.unknownpros.com/rcon/matchconfig?host="+ host
         const response = await Promise.all([rcon.send("get5_loadmatch_url" + ' "'+url+'"')])
-        await rcon.end()
         return response
     }
     catch(error)
@@ -88,7 +86,6 @@ async function matchSettings(host){
         matchconfig.players_per_team = team1.length
         matchconfig.min_players_to_ready = team1.length * 2
         matchconfig.cvars.hostname = "Unknownpros" + host
-        console.log(matchconfig)
         return matchconfig
     }
     catch(error)
