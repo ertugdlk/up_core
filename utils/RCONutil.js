@@ -35,7 +35,6 @@ async function createMatch(){
 async function setupMatch(host){
     try
     {
-        await rcon.connect()
         const url = "https://test.unknownpros.com/rcon/matchconfig?host="+ host
         const response = await Promise.all([rcon.send("get5_loadmatch_url" + ' "'+url+'"')])
         return response
