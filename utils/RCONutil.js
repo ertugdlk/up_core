@@ -23,7 +23,9 @@ async function gameStatus(){
 async function createMatch(){
     try
     {
+        await rcon.connect()
         const response = await Promise.all([rcon.send("get5_creatematch")])
+        rcon.end()
     }
     catch(error)
     {
