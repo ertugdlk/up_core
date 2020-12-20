@@ -35,7 +35,7 @@ async function createMatch(){
 async function setupMatch(host){
     try
     {
-        const url = "http://ec2-52-59-234-23.eu-central-1.compute.amazonaws.com:5000/rcon/matchconfig?host="+ host
+        const url = "https://test.unknownpros.com/rcon/matchconfig?host="+ host
         const response = await Promise.all([rcon.send("get5_loadmatch_url" + ' "'+url+'"')])
         return response
 
