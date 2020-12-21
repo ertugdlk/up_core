@@ -61,33 +61,31 @@ async function matchSettings(host){
         })
         var gameteam1 = [];
         var gameteam2 = [];
+        var maplist = [];
 
-        team1.map( async(member) => {
-            const user = await User.findOne({ nickname: member.nickname})
+        for(var i = 0; i < team1.length ; i++)
+        {
+            const user = await User.findOne({ nickname: team1[i].nickname})
             const detail = await Detail.findOne({user: user._id, platform: '5f9a84fca1f0c0b83de7d696'})
             const newId = new steamid.ID(detail.uniqueID)
             const convertedId = newId.get2()
             gameteam1.push(convertedId)
-        })
+        }
 
-
-        team2.map( async (member) => {
-            const user = await User.findOne({ nickname: member.nickname})
+        for(var i = 0; i < team2.length ; i++)
+        {
+            const user = await User.findOne({ nickname: team2[i].nickname})
             const detail = await Detail.findOne({user: user._id, platform: '5f9a84fca1f0c0b83de7d696'})
             const newId = new steamid.ID(detail.uniqueID)
             const convertedId = newId.get2()
             gameteam2.push(convertedId)
-        })
+        }
 
 
         matchconfig.matchid = room.host
-        /*
         matchconfig.team1.players = gameteam1
         matchconfig.team2.players = gameteam2
-        */
-        /*
-        matchconfig.maplist = room.settings.map
-        */
+        matchconfig.maplist = [room.settings.map]
         matchconfig.players_per_team = team1.length
         matchconfig.min_players_to_ready = team1.length * 2
         matchconfig.cvars.hostname = "Unknownpros" + host
