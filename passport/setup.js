@@ -11,9 +11,9 @@ passport.deserializeUser(function(obj, done) {
       })
 
 passport.use(new SteamStrategy({
-    returnURL: 'http://localhost:5000/steam/redirect',
-    realm: 'http://localhost:5000/',
-    apiKey: '3F7E7FF7EC5EC88290ECF9ED3C63F642'
+    returnURL: 'https://test.unknownpros.com/steam/redirect',
+    realm: 'https://test.unknownpros.com/',
+    apiKey: process.env.STEAM_APIKEY
   },
   function(identifier, profile, done) {
     process.nextTick(function () {

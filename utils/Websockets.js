@@ -281,7 +281,6 @@ class Websockets {
 
                 const changedMember = {nickname: data.nickname, newTeam: newTeam, oldTeam: user.team}
                 global.io.in(gameroom.roomId).emit("teamChange", (changedMember))
-
             } catch (error) {
                 throw error
             }
@@ -299,16 +298,16 @@ class Websockets {
                     await room.update({ team1: (room.team2 - 1) })
                 }
 
-                await GameRoom.findOneAndUpdate({ host: data.host },
+                await GameRoom.findOneAndUpdate({ _id: room._id , 'users.nickname': data.nickname },
                     {
-                        $pull: { 'users': data.nickname }//pull user out of the array
+                        $pull: { 'users.nickname': data.nickname }//pull user out of the array
                     })
 
                 const roomInfo = await GameRoomInfo.findOne({ host: data.host })
                 roomInfo.userCount -= 1
                 await roomInfo.save()
                 client.leave(room.roomId)
-                client.to(room.roomId).emit('leftMessage', data.nickname);
+                global.io.in(room.roomId).emit("UserLeft", (user))
             }
             catch (error) {
                 throw error
