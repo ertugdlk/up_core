@@ -44,6 +44,7 @@ class JWTutil
             {
                 if(!error)
                 {
+                    console.log(decoded.data.user)
                     resolve(decoded.data.user)
                 }
                 else

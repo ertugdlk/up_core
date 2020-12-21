@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const Axios = require('axios')
 const Config = require('config')
-const apiKey = Config.get('platforms.steam.apiKey')
+const apiKey = process.env.STEAM_APIKEY
 
 
 class SteamAPI 

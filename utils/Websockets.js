@@ -2,6 +2,7 @@ const SocketUserBuilder = require('../models/builders/SocketUserBuilder')
 const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
 const moment = require('moment')
+const {createMatch, setupMatch} = require('../utils/RCONutil')
 const _ = require('lodash')
 const { findOneAndDelete, findOneAndUpdate } = require('../models/GameRoom')
 const Game = require('../models/Game')
@@ -13,7 +14,7 @@ async function findHostedRoomUpdate(client, data_nickname) {
     if (hostedRoom) {
         //if there was any room or operation Host by this user unset expire date for them
         await GameRoom.updateOne({ _id: hostedRoom._id }, { $unset: { expireAt: 1 } })
-        client.emit("openedRoom", (hostedRoom))
+        client.emit("openedRoom", ({room: hostedRoom, nickname: data_nickname}))
         client.join(hostedRoom.roomId)
     }
 }
@@ -21,7 +22,7 @@ async function findHostedRoomUpdate(client, data_nickname) {
 async function findOpenedRoomUpdate(client, data_nickname) {
     const openedRoom = await GameRoom.findOne({ users: {$elemMatch: {nickname: data_nickname}} })
     if (openedRoom) {
-        client.emit("openedRoom", (openedRoom))
+        client.emit("openedRoom", ({room: openedRoom, nickname: data_nickname}))
         client.join(openedRoom.roomId)
     }
 }
@@ -109,7 +110,7 @@ class Websockets {
                     client.emit('Error', 'exist hoted_room')
                 }
                 else {
-                    let roomUsers = [{ nickname: gameData.host, team: 1 }]
+                    let roomUsers = [{ nickname: gameData.host, team: 1 , readyStatus: 1}]
                     //save room in MongoDB info and room
                     const gameInfo = new GameRoomInfo({ room: client.id, name: gameData.name, type: gameData.type, host: gameData.host, map: gameData.map, fee: gameData.fee, reward: gameData.fee * 2, createdAt: gameData.createdAt })
                     const savedGameInfo = await gameInfo.save()
@@ -170,10 +171,15 @@ class Websockets {
             try {
                 const joinedRoom = await checkJoinedRoom(data.nickname)
                 const room = await GameRoom.findOne({ host: data.host })
+                const roomUserLimit = parseInt(room.settings.type.charAt(0)) * 2
 
-                if(!room || joinedRoom == true){
+                if(!room || joinedRoom == true || room.users.length == roomUserLimit){
                     if(joinedRoom == true){
                         client.emit('Error', 'exist_joined_room')
+                    }
+                    else if( room.users.length == roomUserLimit)
+                    {
+                        client.emit('Error', 'room_is_full')
                     }
                     else{
                         client.emit('Error', 'room_does_not_exist')
@@ -198,12 +204,14 @@ class Websockets {
                     //connect this socketId to gameroom's roomid
                     client.join(room.roomId)
                     client.emit("roomData", (savedRoom))
+                    global.io.in(room.roomId).emit("newUserJoined", ({nickname: data.nickname, team: t, readyStatus: 0}))
                 }
             }
             catch (error) {
                 throw error
             }
         })
+
 
 
         client.on("ready", async (data) => {
@@ -213,28 +221,44 @@ class Websockets {
                 const ready = user.readyStatus
 
                 if (!ready) {
-                    room.update({ 'users.nickname': data.nickname }, {
-                        '$set': {
-                            'users.$.readyStatus': 1
-                        }
-                    }, function (err) {
-                        throw err
-                    })
+                    await GameRoom.updateOne({_id: room._id, 'users.nickname': data.nickname }, 
+                    { "$set": { "users.$.readyStatus": 1}})
+                    const changedMember = {nickname: data.nickname}
+                    const updatedRoom = await GameRoom.findOne({_id: room._id})
+                    const roomUserLimit = parseInt(updatedRoom.settings.type.charAt(0)) * 2
+                    updatedRoom.readyCount += 1
+                    await updatedRoom.save()
+                    if(updatedRoom.readyCount == roomUserLimit)
+                    {
+                        global.io.in(room.roomId).emit("GameReadyStatus", ('all_ready'))
+                    }
+                    global.io.in(room.roomId).emit("readyChange", (changedMember))
                 } else {
-                    room.update({ 'users.nickname': data.nickname }, {
-                        '$set': {
-                            'users.$.readyStatus': 0
-                        }
-                    }, function (err) {
-                        throw err
-                    })
+                    await GameRoom.updateOne({_id: room._id, 'users.nickname': data.nickname }, 
+                    { "$set": { "users.$.readyStatus": 0}})
+                    const changedMember = {nickname: data.nickname}
+                    const updatedRoom = await GameRoom.findOne({_id: room._id})
+                    updatedRoom.readyCount -= 1
+                    await updatedRoom.save()
+                    global.io.in(room.roomId).emit("GameReadyStatus", ('not_ready'))
+                    global.io.in(room.roomId).emit("readyChange", (changedMember))
                 }
-
             } catch (error) {
                 throw error
             }
         })
 
+        client.on('countdown', async(data) => {
+            try{
+                const gameRoom = await GameRoom.findOne({host: data.host})
+                const returnData = {msg: 'Game is starting...'}
+                global.io.in(gameRoom.roomId).emit("countdownStart", (returnData))
+            }
+            catch(error)
+            {
+                throw error
+            }
+        })
 
         client.on('changeTeam', async (data) => {
             try {
@@ -252,13 +276,11 @@ class Websockets {
                     newTeam = 1
                 }
 
-                
                 await GameRoom.updateOne({_id: gameroom._id, 'users.nickname': data.nickname }, 
                     { "$set": { "users.$.team": newTeam}})
 
                 const changedMember = {nickname: data.nickname, newTeam: newTeam, oldTeam: user.team}
                 global.io.in(gameroom.roomId).emit("teamChange", (changedMember))
-
             } catch (error) {
                 throw error
             }
@@ -276,16 +298,16 @@ class Websockets {
                     await room.update({ team1: (room.team2 - 1) })
                 }
 
-                await GameRoom.findOneAndUpdate({ host: data.host },
+                await GameRoom.findOneAndUpdate({ _id: room._id , 'users.nickname': data.nickname },
                     {
-                        $pull: { 'users': data.nickname }//pull user out of the array
+                        $pull: { 'users.nickname': data.nickname }//pull user out of the array
                     })
 
                 const roomInfo = await GameRoomInfo.findOne({ host: data.host })
                 roomInfo.userCount -= 1
                 await roomInfo.save()
                 client.leave(room.roomId)
-                client.to(room.roomId).emit('leftMessage', data.nickname);
+                global.io.in(room.roomId).emit("UserLeft", (user))
             }
             catch (error) {
                 throw error
