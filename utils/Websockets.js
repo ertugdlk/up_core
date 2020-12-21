@@ -205,7 +205,7 @@ class Websockets {
                     client.join(room.roomId)
                     client.emit("roomData", (savedRoom))
                     global.io.in(room.roomId).emit("newUserJoined", ({nickname: data.nickname, team: t, readyStatus: 0}))
-                    global.io.local("userCountChange" , ({host: data.host, positive:true}))
+                    global.io.local.emit("userCountChange" , ({host: data.host, positive:true}) )
                 }
             }
             catch (error) {
