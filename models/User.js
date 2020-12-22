@@ -59,9 +59,9 @@ userModel.methods.generateAuthToken = async function () {
 }
 
 userModel.methods.findByCredentials = async function (password) {
-    const isPasswordMatch = bcrypt.compare(password, this.password)
-    if (!isPasswordMatch) {
-        throw new error({ error: 'Invalid' })
+    const isPasswordMatch = await bcrypt.compare(password, this.password)
+    if (isPasswordMatch === false) {
+        return false
     }
     else {
         return true
