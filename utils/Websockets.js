@@ -304,9 +304,10 @@ class Websockets {
                     {
                         $pull: { users: { nickname: data.nickname }}//pull user out of the array
                     })
-                    await GameRoom.updateOne({ _id: room._id }, { host: room.users[0].nickname })
-                    global.io.local.emit("hostChanged", { host: data.host, newHost: room.users[0].nickname })
-                    global.io.in(room.roomId).emit("HostLeft", ({host: user, newHost: room.users[0]}))
+                    await GameRoom.updateOne({ _id: room._id }, { host: room.users[1].nickname })
+                    await GameRoom.updateOne({host: data.host}, {host: room.users[1].nickname})
+                    global.io.local.emit("hostChanged", { host: data.host, newHost: room.users[1].nickname })
+                    global.io.in(room.roomId).emit("HostLeft", ({host: user, newHost: room.users[1]}))
                     global.io.local.emit("userCountChange" , ({host: data.host, positive: false}) )
                 }
                 else if (user.nickname !== data.host) {
