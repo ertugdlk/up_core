@@ -308,7 +308,7 @@ class Websockets {
                     await GameRoomInfo.updateOne({host: data.host}, {host: room.users[1].nickname})
                     global.io.local.emit("hostChanged", { host: data.host, newHost: room.users[1].nickname })
                     global.io.in(room.roomId).emit("HostLeft", ({host: user, newHost: room.users[1]}))
-                    global.io.local.emit("userCountChange" , ({host: room.users[1], positive: false}) )
+                    global.io.local.emit("userCountChange" , ({host: room.users[1].nickname, positive: false}) )
                 }
                 else if (user.nickname !== data.host) {
                     await GameRoom.updateOne({ _id: room._id, 'users.nickname': data.nickname },
