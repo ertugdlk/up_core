@@ -121,7 +121,7 @@ class Websockets {
                     client.join(gameRoom.roomId)
 
                     client.emit('roomCreated', savedRoom)
-
+                    client.emit("openedRoom", ({ room: savedRoom, nickname: gameData.host }))
                     //on every create send set new rooms for every socket
                     global.io.local.emit('newRoom', gameInfo)
                 }
@@ -203,7 +203,8 @@ class Websockets {
                     client.join(room.roomId)
                     client.emit("roomData", (savedRoom))
                     global.io.in(room.roomId).emit("newUserJoined", ({nickname: data.nickname, team: t, readyStatus: 0}))
-                    global.io.local.emit("userCountChange" , ({host: data.host, positive:true}) )
+                    global.io.local.emit("userCountChange" , ({host: data.host, positive:true}))
+                    client.emit("openedRoom", ({ room: savedRoom, nickname: data.nickname }))
                 }
             }
             catch (error) {
