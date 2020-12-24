@@ -206,7 +206,7 @@ class Websockets {
                     if (updatedRoom.readyCount == roomUserLimit) {
                         global.io.in(room.roomId).emit("GameReadyStatus", ('all_ready'))
                     }
-                    global.io.in(room.roomId).emit("readyChange", (changedMember))
+                    global.io.in(room.roomId).emit("readyChange", ({host:updatedRoom.host, member: changedMember}))
                 } else {
                     await GameRoom.updateOne({ _id: room._id, 'users.nickname': data.nickname },
                         { "$set": { "users.$.readyStatus": 0 } })
@@ -215,7 +215,7 @@ class Websockets {
                     updatedRoom.readyCount -= 1
                     await updatedRoom.save()
                     global.io.in(room.roomId).emit("GameReadyStatus", ('not_ready'))
-                    global.io.in(room.roomId).emit("readyChange", (changedMember))
+                    global.io.in(room.roomId).emit("readyChange", ({host:updatedRoom.host, member: changedMember}))
                 }
             } catch (error) {
                 throw error
