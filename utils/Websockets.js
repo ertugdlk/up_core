@@ -268,7 +268,7 @@ class Websockets {
                 if (t === 1) {
                     await room.update({ team1: (room.team1 - 1) })
                 } else if (t === 2) {
-                    await room.update({ team1: (room.team2 - 1) })
+                    await room.update({ team2: (room.team2 - 1) })
                 }
 
                 const roomInfo = await GameRoomInfo.findOne({ host: data.host })
@@ -279,7 +279,7 @@ class Websockets {
                     if(roomInfo.userCount === 0){
                         await GameRoom.findByIdAndDelete(room._id)
                         await GameRoomInfo.findByIdAndDelete(roomInfo._id)
-                        global.io.local.emit("roomDeleted", { host: data.host})
+                        global.io.local.emit("roomDeleted", ({ host: data.host}))
                     }
                     else{
                         await GameRoom.updateOne({ _id: room._id, 'users.nickname': data.nickname },
@@ -290,6 +290,7 @@ class Websockets {
                         await GameRoomInfo.updateOne({host: data.host}, {host: room.users[1].nickname})
                         await GameRoom.updateOne({ _id: room._id, 'users.nickname': room.users[1].nickname},
                         { "$set": { "users.$.readyStatus": 1 } })
+
                         global.io.local.emit("hostChanged", { host: data.host, newHost: room.users[1].nickname })
                         global.io.in(room.roomId).emit("HostLeft", ({host: user, newHost: room.users[1]}))
                         global.io.local.emit("userCountChange" , ({host: room.users[1].nickname, positive: false}) )
