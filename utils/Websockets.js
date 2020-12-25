@@ -204,7 +204,7 @@ class Websockets {
                     updatedRoom.readyCount += 1
                     await updatedRoom.save()
                     if (updatedRoom.readyCount == roomUserLimit) {
-                        global.io.in(room.roomId).emit("GameReadyStatus", ({host:updatedRoom ,msg:'all_ready'}))
+                        global.io.in(room.roomId).emit("GameReadyStatus", ({host:updatedRoom.host ,msg:'all_ready'}))
                     }
                     global.io.in(room.roomId).emit("readyChange", ({host:updatedRoom.host, member: changedMember}))
                 } else {
