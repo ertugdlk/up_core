@@ -287,7 +287,7 @@ class Websockets {
                         {
                             $pull: { users: { nickname: data.nickname }}//pull user out of the array
                         })
-                        if(room.users[1].readyStatus == 1){
+                        if(room.users[1].readyStatus == 0){
                             await GameRoom.updateOne({_id: room._id}, {readyCount: room.readyCount+1})
                         }
                         await GameRoom.updateOne({ _id: room._id }, { host: room.users[1].nickname })
