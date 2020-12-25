@@ -282,18 +282,26 @@ class Websockets {
                         global.io.local.emit("roomDeleted", ({ host: data.host}))
                     }
                     else{
-                        await GameRoom.updateOne({_id: room._id}, {readyCount: room.readyCount-1})
+                        //DB READYCOUNT
+                        var newReadyCount = room.readyCount -1
+                        await GameRoom.updateOne({_id: room._id}, {readyCount: newReadyCount})
                         await GameRoom.updateOne({ _id: room._id, 'users.nickname': data.nickname },
                         {
                             $pull: { users: { nickname: data.nickname }}//pull user out of the array
                         })
                         if(room.users[1].readyStatus == 0){
-                            await GameRoom.updateOne({_id: room._id}, {readyCount: room.readyCount+1})
+                            newReadyCount += 1
+                            await GameRoom.updateOne({_id: room._id}, {readyCount: newReadyCount})
                         }
+
+                        //DB HOST FIELD UPDATE
                         await GameRoom.updateOne({ _id: room._id }, { host: room.users[1].nickname })
                         await GameRoomInfo.updateOne({host: data.host}, {host: room.users[1].nickname})
+
+                        //NEWHOST READY STATUS
                         await GameRoom.updateOne({ _id: room._id, 'users.nickname': room.users[1].nickname},
                         { "$set": { "users.$.readyStatus": 1 } })
+
                         global.io.local.emit("hostChanged", { host: data.host, newHost: room.users[1].nickname })
                         global.io.in(room.roomId).emit("HostLeft", ({host: user, newHost: room.users[1]}))
                         global.io.local.emit("userCountChange" , ({host: room.users[1].nickname, positive: false}) )
