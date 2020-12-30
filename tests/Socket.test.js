@@ -8,7 +8,7 @@ let httpServerAdr;
 let ioServer;
 let socket;
 
-describe("Socket.io  Test" , () => {
+describe("Socket.io  Test", () => {
     beforeAll(async (done) => {
         httpServer = http.createServer().listen()
         httpServerAdr = httpServer.address()
@@ -17,27 +17,27 @@ describe("Socket.io  Test" , () => {
     })
 
     beforeEach(async (done) => {
-        socket = io('http://'+ httpServerAdr.address + ':' + httpServerAdr.port + '/' , {
+        socket = io('http://' + httpServerAdr.address + ':' + httpServerAdr.port + '/', {
             transports: ['websocket'],
-          })
+        })
 
         done();
     })
 
-    it("test" , async() => {
-        socket.emit('msg' , 'deneme')
+    it("test", async () => {
+        socket.emit('msg', 'deneme')
 
         setTimeout(() => {
-            ioServer.on('msg' , (data) => {
+            ioServer.on('msg', (data) => {
                 const msg = data
                 expect(msg).toBe('deneme')
             })
 
-        } , 50)
+        }, 50)
     })
 
     afterEach(async (done) => {
-        if(socket.conneted){
+        if (socket.conneted) {
             socket.disconnect()
         }
         done();
