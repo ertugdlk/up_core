@@ -1,9 +1,11 @@
 const SocketUserBuilder = require('../models/builders/SocketUserBuilder')
 const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
+const ChatHistory = require('../models/ChatHistory')
 const moment = require('moment')
 const _ = require('lodash')
 const Game = require('../models/Game')
+const { findOne } = require('../models/GameRoom')
 var clients = []
 //bu array global mi
 
@@ -122,6 +124,10 @@ class Websockets {
                     client.emit("openedRoom", ({ room: savedRoom, nickname: gameData.host }))
                     //on every create send set new rooms for every socket
                     global.io.local.emit('newRoom', gameInfo)
+
+                    //create a chatlog for the room that expires in 7 days
+                    const chatHistory = new ChatHistory({ room: savedRoom._id, messages: { message: "Game Room Created", nickname: "_DEFAULT_MESSAGE_SENDER" } })
+                    const savedChatHistory = await chatHistory.save()
                 }
             }
             catch (error) {
@@ -134,6 +140,11 @@ class Websockets {
             try {
                 const room = await GameRoom.findOne({ host: data.host })
                 const messageObject = { nickname: data.nickname, message: data.msg }
+
+                //add mesages to chat history
+                const chatHistory = await findOne({ room: room })
+                chatHistory.messages.push({ nickanem: messageObject.nickname, message: messageObject.message })
+
                 global.io.in(room.roomId).emit("newMessage", (messageObject))
             }
             catch (error) {
@@ -177,8 +188,8 @@ class Websockets {
                     //connect this socketId to gameroom's roomid
                     client.join(room.roomId)
                     client.emit("roomData", (savedRoom))
-                    global.io.in(room.roomId).emit("newUserJoined", ({nickname: data.nickname, team: t, readyStatus: 0}))
-                    global.io.local.emit("userCountChange" , ({host: data.host, positive:true}))
+                    global.io.in(room.roomId).emit("newUserJoined", ({ nickname: data.nickname, team: t, readyStatus: 0 }))
+                    global.io.local.emit("userCountChange", ({ host: data.host, positive: true }))
                     client.emit("openedRoom", ({ room: savedRoom, nickname: data.nickname }))
                 }
             }
@@ -204,9 +215,9 @@ class Websockets {
                     updatedRoom.readyCount += 1
                     await updatedRoom.save()
                     if (updatedRoom.readyCount == roomUserLimit) {
-                        global.io.in(room.roomId).emit("GameReadyStatus", ({host:updatedRoom.host ,msg:'all_ready'}))
+                        global.io.in(room.roomId).emit("GameReadyStatus", ({ host: updatedRoom.host, msg: 'all_ready' }))
                     }
-                    global.io.in(room.roomId).emit("readyChange", ({host:updatedRoom.host, member: changedMember}))
+                    global.io.in(room.roomId).emit("readyChange", ({ host: updatedRoom.host, member: changedMember }))
                 } else {
                     await GameRoom.updateOne({ _id: room._id, 'users.nickname': data.nickname },
                         { "$set": { "users.$.readyStatus": 0 } })
@@ -214,8 +225,8 @@ class Websockets {
                     const updatedRoom = await GameRoom.findOne({ _id: room._id })
                     updatedRoom.readyCount -= 1
                     await updatedRoom.save()
-                    global.io.in(room.roomId).emit("GameReadyStatus", ({host: updatedRoom.host, msg:'not_ready'}))
-                    global.io.in(room.roomId).emit("readyChange", ({host:updatedRoom.host, member: changedMember}))
+                    global.io.in(room.roomId).emit("GameReadyStatus", ({ host: updatedRoom.host, msg: 'not_ready' }))
+                    global.io.in(room.roomId).emit("readyChange", ({ host: updatedRoom.host, member: changedMember }))
                 }
             } catch (error) {
                 throw error
@@ -276,46 +287,46 @@ class Websockets {
                 await roomInfo.save()
 
                 if (user.nickname === data.host) {
-                    if(roomInfo.userCount === 0){
+                    if (roomInfo.userCount === 0) {
                         await GameRoom.findByIdAndDelete(room._id)
                         await GameRoomInfo.findByIdAndDelete(roomInfo._id)
-                        global.io.local.emit("roomDeleted", ({ host: data.host}))
+                        global.io.local.emit("roomDeleted", ({ host: data.host }))
                     }
-                    else{
+                    else {
                         //DB READYCOUNT
-                        var newReadyCount = room.readyCount -1
-                        await GameRoom.updateOne({_id: room._id}, {readyCount: newReadyCount})
+                        var newReadyCount = room.readyCount - 1
+                        await GameRoom.updateOne({ _id: room._id }, { readyCount: newReadyCount })
                         await GameRoom.updateOne({ _id: room._id, 'users.nickname': data.nickname },
-                        {
-                            $pull: { users: { nickname: data.nickname }}//pull user out of the array
-                        })
-                        if(room.users[1].readyStatus == 0){
+                            {
+                                $pull: { users: { nickname: data.nickname } }//pull user out of the array
+                            })
+                        if (room.users[1].readyStatus == 0) {
                             newReadyCount += 1
-                            await GameRoom.updateOne({_id: room._id}, {readyCount: newReadyCount})
+                            await GameRoom.updateOne({ _id: room._id }, { readyCount: newReadyCount })
                         }
 
                         //DB HOST FIELD UPDATE
                         await GameRoom.updateOne({ _id: room._id }, { host: room.users[1].nickname })
-                        await GameRoomInfo.updateOne({host: data.host}, {host: room.users[1].nickname})
+                        await GameRoomInfo.updateOne({ host: data.host }, { host: room.users[1].nickname })
 
                         //NEWHOST READY STATUS
-                        await GameRoom.updateOne({ _id: room._id, 'users.nickname': room.users[1].nickname},
-                        { "$set": { "users.$.readyStatus": 1 } })
+                        await GameRoom.updateOne({ _id: room._id, 'users.nickname': room.users[1].nickname },
+                            { "$set": { "users.$.readyStatus": 1 } })
 
                         global.io.local.emit("hostChanged", { host: data.host, newHost: room.users[1].nickname })
-                        global.io.in(room.roomId).emit("HostLeft", ({host: user, newHost: room.users[1]}))
-                        global.io.local.emit("userCountChange" , ({host: room.users[1].nickname, positive: false}) )
+                        global.io.in(room.roomId).emit("HostLeft", ({ host: user, newHost: room.users[1] }))
+                        global.io.local.emit("userCountChange", ({ host: room.users[1].nickname, positive: false }))
                     }
                 }
                 else if (user.nickname !== data.host) {
                     await GameRoom.updateOne({ _id: room._id, 'users.nickname': data.nickname },
                         {
-                            $pull: { users: { nickname: data.nickname }}//pull user out of the array
+                            $pull: { users: { nickname: data.nickname } }//pull user out of the array
                         })
                     global.io.in(room.roomId).emit("UserLeft", (user))
-                    global.io.local.emit("userCountChange" , ({host: data.host, positive: false}) )
+                    global.io.local.emit("userCountChange", ({ host: data.host, positive: false }))
                 }
-                
+
                 client.leave(room.roomId)
             }
             catch (error) {
