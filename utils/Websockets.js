@@ -253,6 +253,17 @@ class Websockets {
             }
         })
 
+        client.on('stopCountdown', async (data) => {
+            try {
+                const gameRoom = await GameRoom.findOne({ host: data.host })
+                const returnData = { msg: 'Countdown stopped' }
+                global.io.in(gameRoom.roomId).emit("countdownStop", (returnData))
+            }
+            catch (error) {
+                throw error
+            }
+        })
+
         client.on('started', async ({ host }) => {
             try {
                 await GameRoom.findOneAndUpdate({ host: host }, { status: 'playing' })
