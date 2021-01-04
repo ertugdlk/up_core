@@ -127,7 +127,7 @@ class Websockets {
 
                     //create a chatlog for the room that expires in 7 days
                     const chatHistory = new ChatHistory({ room: savedRoom._id, messages: { message: "Game Room Created", nickname: "_DEFAULT_MESSAGE_SENDER" } })
-                    const savedChatHistory = await chatHistory.save()
+                    await chatHistory.save()
                 }
             }
             catch (error) {
@@ -142,8 +142,9 @@ class Websockets {
                 const messageObject = { nickname: data.nickname, message: data.msg }
 
                 //add mesages to chat history
-                const chatHistory = await findOne({ room: room })
-                chatHistory.messages.push({ nickanem: messageObject.nickname, message: messageObject.message })
+                const chatHistory = await ChatHistory.findOne({ room: room._id })
+                chatHistory.messages.push({ nickname: messageObject.nickname, message: messageObject.message })
+                await chatHistory.save()
 
                 global.io.in(room.roomId).emit("newMessage", (messageObject))
             }

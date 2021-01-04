@@ -21,6 +21,6 @@ const ChatHistorySchema = new Mongoose.Schema({
     messages  =[message]
 }, { versionKey: false })
 
-ChatHistorySchema.index({ createdAt: Date.now }, { expireAfterSeconds: 604800 });
+ChatHistorySchema.index({ 'createdAt': Date.now }, { expireAfterSeconds: 604800 });
 
 module.exports = Mongoose.model('ChatHistory', ChatHistorySchema)
