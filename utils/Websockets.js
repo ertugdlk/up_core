@@ -1,9 +1,11 @@
 const SocketUserBuilder = require('../models/builders/SocketUserBuilder')
 const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
+const ChatHistory = require('../models/ChatHistory')
 const moment = require('moment')
 const _ = require('lodash')
 const Game = require('../models/Game')
+const { findOne } = require('../models/GameRoom')
 var clients = []
 //bu array global mi
 
@@ -122,6 +124,10 @@ class Websockets {
                     client.emit("openedRoom", ({ room: savedRoom, nickname: gameData.host }))
                     //on every create send set new rooms for every socket
                     global.io.local.emit('newRoom', gameInfo)
+
+                    //create a chatlog for the room that expires in 7 days
+                    const chatHistory = new ChatHistory({ room: savedRoom._id, messages: { message: "Game Room Created", nickname: "_DEFAULT_MESSAGE_SENDER" } })
+                    const savedChatHistory = await chatHistory.save()
                 }
             }
             catch (error) {
@@ -134,6 +140,11 @@ class Websockets {
             try {
                 const room = await GameRoom.findOne({ host: data.host })
                 const messageObject = { nickname: data.nickname, message: data.msg }
+
+                //add mesages to chat history
+                const chatHistory = await findOne({ room: room })
+                chatHistory.messages.push({ nickanem: messageObject.nickname, message: messageObject.message })
+
                 global.io.in(room.roomId).emit("newMessage", (messageObject))
             }
             catch (error) {
