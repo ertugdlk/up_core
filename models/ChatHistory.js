@@ -18,7 +18,7 @@ const message = new Mongoose.Schema(
 const ChatHistorySchema = new Mongoose.Schema({
     room: { type: Schema.Types.ObjectId, ref: 'GameRoom' },
     createdAt: { type: Date, default: Date.now },
-    messages  =[message]
+    messages: [message]
 }, { versionKey: false })
 
 ChatHistorySchema.index({ 'createdAt': Date.now }, { expireAfterSeconds: 604800 });
