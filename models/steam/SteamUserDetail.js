@@ -28,17 +28,21 @@ class SteamUserDetail {
         try {
             const platform = PlatformID
             const response = await SteamAPI.getOwnedGames({ steamID })
-            const SteamGames = await Game.find({ platform: platform })
+            if (response == []) {
+                return null
+            }
+            else {
+                const SteamGames = await Game.find({ platform: platform })
 
-            await SteamGames.map(game => {
-                const MatchedGame = _.find(response, { 'appid': Number(game.appID) })
-                if (MatchedGame) {
-                    detail.games.push({ id: game._id })
-                }
-            })
+                await SteamGames.map(game => {
+                    const MatchedGame = _.find(response, { 'appid': Number(game.appID) })
+                    if (MatchedGame) {
+                        detail.games.push({ id: game._id })
+                    }
+                })
 
-            return detail
-
+                return detail
+            }
         }
         catch (error) {
             throw error
