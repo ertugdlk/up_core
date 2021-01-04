@@ -1,6 +1,7 @@
 const Mongoose = require('mongoose')
 const _ = require('lodash')
 const Schema = Mongoose.Schema
+const moment = require('moment')
 
 const message = new Mongoose.Schema(
     {
@@ -17,10 +18,10 @@ const message = new Mongoose.Schema(
 
 const ChatHistorySchema = new Mongoose.Schema({
     room: { type: Schema.Types.ObjectId, ref: 'GameRoom' },
-    createdAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now, expires: 20 },
     messages: [message],
 }, { versionKey: false })
 
-ChatHistorySchema.index({ 'createdAt': Date.now }, { expireAfterSeconds: 20 });
+ChatHistorySchema.index({ 'createdAt': 1 }, { expireAfterSeconds: 20 });
 
 module.exports = Mongoose.model('ChatHistory', ChatHistorySchema)
