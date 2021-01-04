@@ -17,11 +17,10 @@ const message = new Mongoose.Schema(
 
 const ChatHistorySchema = new Mongoose.Schema({
     room: { type: Schema.Types.ObjectId, ref: 'GameRoom' },
-    messages: [message],
     createdAt: { type: Date, default: Date.now },
-    expireAt: { type: Date, expires: 20 },
+    messages: [message],
 }, { versionKey: false })
 
-ChatHistorySchema.index({ 'expireAt': Date.now }, { expireAfterSeconds: 20 });
+ChatHistorySchema.index({ 'createdAt': Date.now }, { expireAfterSeconds: 20 });
 
 module.exports = Mongoose.model('ChatHistory', ChatHistorySchema)
