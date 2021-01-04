@@ -28,7 +28,7 @@ class SteamUserDetail {
         try {
             const platform = PlatformID
             const response = await SteamAPI.getOwnedGames({ steamID })
-            if (response == []) {
+            if (response === undefined) {
                 return null
             }
             else {
