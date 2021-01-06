@@ -1,3 +1,4 @@
+const util = require('util')
 const redis = require('redis')
 const client = redis.createClient({
     port: process.env.redis_port,
@@ -5,57 +6,84 @@ const client = redis.createClient({
     password: process.env.redis_password
 })
 
-const createRoom = async (SocketId, GameRoomObject) => {
+const avaible = 'avaible_servers'
+const busy = 'busy_servers'
+const listPush = util.promisify(client.RPUSH)
+const listPop = util.promisify(client.RPOP)
+const listElements = util.promisify(client.LRANGE)
+
+//Avaible Servers 
+async function addAvaibleServer(serverInformation) {
     try {
-        const encodedGameRoom = JSON.stringify(GameRoomObject)
-        const message = await client.set('room:' + SocketId, encodedGameRoom)
-
-        if (message === "OK") {
-            return 'success'
-        }
-        else {
-            return 'failed'
-        }
-    }
-    catch (err) {
-        throw error
-    }
-}
-
-function getRooms(callback) {
-    try {
-        client.scan(0, (err, reply) => {
-            if (err) {
-                return err
-            }
-            callback(reply)
-        })
-    }
-    catch (error) {
-        throw error
-    }
-
-}
-
-function getRoom(key, callback) {
-    try {
-        client.GET(key, (err, data) => {
-            if (err) {
-                return 'failed' + err
-            }
-
-            const decodedGameRoom = JSON.parse(data)
-            callback(decodedGameRoom)
-        })
+        await listPush(avaible, serverInformation)
     }
     catch (error) {
         throw error
     }
 }
 
-const closeRoom = async (SocketId) => {
+async function removeAvaibleServer() {
     try {
-        await client.del('room:' + SocketId)
+        await listPop(avaible)
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+async function getAvaibleServers() {
+    try {
+        const response = await listElements(avaible, 0, -1)
+        return response
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+async function getAvaibleServer() {
+    try {
+        const response = await listElements(avaible, -1, -1)
+        return response
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+//Busy Servers 
+async function addBusyServer(serverInformation) {
+    try {
+        await listPush(busy, serverInformation)
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+async function removeBusyServer() {
+    try {
+        await listPop(busy, serverInformation)
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+async function getBusyServers() {
+    try {
+        const response = await listElements(busy, 0, -1)
+        return response
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+async function getBusyServer() {
+    try {
+        const response = await listElements(busy, -1, -1)
+        return response
     }
     catch (error) {
         throw error
@@ -63,8 +91,12 @@ const closeRoom = async (SocketId) => {
 }
 
 module.exports = {
-    getRoom,
-    createRoom,
-    closeRoom,
-    getRooms,
+    addAvaibleServer,
+    removeAvaibleServer,
+    getAvaibleServers,
+    getAvaibleServer,
+    addBusyServer,
+    removeBusyServer,
+    getBusyServers,
+    getBusyServer
 }
