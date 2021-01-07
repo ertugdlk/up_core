@@ -2,6 +2,7 @@ const SocketUserBuilder = require('../models/builders/SocketUserBuilder')
 const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
 const ChatHistory = require('../models/ChatHistory')
+const RoomBlackList = require('../models/RoomBlackList')
 const moment = require('moment')
 const _ = require('lodash')
 const Game = require('../models/Game')
@@ -155,10 +156,17 @@ class Websockets {
 
         client.on("join", async (data) => {
             try {
+
                 const joinedRoom = await checkJoinedRoom(data.nickname)
                 const room = await GameRoom.findOne({ host: data.host })
+                const balckList = await RoomBlackList.findOne({ room: room._id })
                 const roomUserLimit = parseInt(room.settings.type.charAt(0)) * 2
-
+                const blackListedUsers = blackList.users
+                for (let i = 0; i < blackListedUsers.length; i++) {
+                    if (data.nickname == blackListedUsers[i].nickname) {
+                        client.emit('Error', 'You are kicked')
+                    }
+                }
                 if (!room || joinedRoom == true || room.users.length == roomUserLimit) {
                     if (joinedRoom == true) {
                         client.emit('Error', 'exist_joined_room')
@@ -245,6 +253,17 @@ class Websockets {
             }
         })
 
+        client.on('stopCountdown', async (data) => {
+            try {
+                const gameRoom = await GameRoom.findOne({ host: data.host })
+                const returnData = { msg: 'Countdown stopped' }
+                global.io.in(gameRoom.roomId).emit("countdownStop", (returnData))
+            }
+            catch (error) {
+                throw error
+            }
+        })
+
         client.on('started', async ({ host }) => {
             try {
                 await GameRoom.findOneAndUpdate({ host: host }, { status: 'playing' })
@@ -296,7 +315,11 @@ class Websockets {
         client.on('kick', async ({ host, nickname }) => {
             try {
                 const room = await GameRoom.findOne({ host: host })
-                const user = _.find(room.users, { nickname: nickname })//find which user kicked
+                const balckList = await RoomBlackList.findOne({ room: room._id })
+                blackList.users.push({ nickname: nickname })
+                await blackList.save()
+                client.emit('userKicked', ({ nickname: nickname }))
+                //const user = _.find(room.users, { nickname: nickname })//find which user kicked
             }
             catch (error) {
                 throw error
