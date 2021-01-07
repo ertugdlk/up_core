@@ -316,9 +316,10 @@ class Websockets {
             try {
                 const room = await GameRoom.findOne({ host: host })
                 const balckList = await RoomBlackList.findOne({ room: room._id })
+                const user = _.find(room.users, { nickname: nickname })
                 blackList.users.push({ nickname: nickname })
                 await blackList.save()
-                client.emit('userKicked', ({ nickname: nickname }))
+                client.emit('userKicked', ({ nickname: nickname, team: user.team }))
                 //const user = _.find(room.users, { nickname: nickname })//find which user kicked
             }
             catch (error) {
