@@ -163,7 +163,8 @@ class Websockets {
 
                 const joinedRoom = await checkJoinedRoom(data.nickname)
                 const room = await GameRoom.findOne({ host: data.host })
-                const balckList = await RoomBlackList.findOne({ room: room._id })
+
+                const blackList = await RoomBlackList.findOne({ room: room._id })
                 const roomUserLimit = parseInt(room.settings.type.charAt(0)) * 2
                 const blackListedUsers = blackList.users
                 for (let i = 0; i < blackListedUsers.length; i++) {
@@ -171,6 +172,7 @@ class Websockets {
                         client.emit('Error', 'You are kicked')
                     }
                 }
+
                 if (!room || joinedRoom == true || room.users.length == roomUserLimit) {
                     if (joinedRoom == true) {
                         client.emit('Error', 'exist_joined_room')
