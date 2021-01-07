@@ -129,6 +129,10 @@ class Websockets {
                     //create a chatlog for the room that expires in 7 days
                     const chatHistory = new ChatHistory({ room: savedRoom._id, messages: { message: "Game Room Created", nickname: "_DEFAULT_MESSAGE_SENDER" } })
                     await chatHistory.save()
+
+                    //create a blacklist for room
+                    const blackList = new RoomBlackList({ room: savedRoom._id, users: [] })
+                    await blackList.save()
                 }
             }
             catch (error) {
@@ -315,7 +319,7 @@ class Websockets {
         client.on('kick', async ({ host, nickname }) => {
             try {
                 const room = await GameRoom.findOne({ host: host })
-                const balckList = await RoomBlackList.findOne({ room: room._id })
+                const blackList = await RoomBlackList.findOne({ room: room._id })
                 const user = _.find(room.users, { nickname: nickname })
                 blackList.users.push({ nickname: nickname })
                 await blackList.save()
@@ -327,6 +331,10 @@ class Websockets {
             }
         })
 
+
+        /*
+        Blacklist i sil (oda kapanırken)
+        */
         client.on("leave", async (data) => {
             try {
                 const room = await GameRoom.findOne({ host: data.host })
