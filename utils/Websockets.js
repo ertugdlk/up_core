@@ -325,6 +325,7 @@ class Websockets {
                 await blackList.save()
                 global.io.in(room.roomId).emit('userKicked', ({ nickname: nickname, team: user.team }))
                 //const user = _.find(room.users, { nickname: nickname })//find which user kicked
+
             }
             catch (error) {
                 throw error
