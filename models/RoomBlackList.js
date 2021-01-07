@@ -1,7 +1,7 @@
 const Mongoose = require('mongoose')
 const Schema = Mongoose.Schema
 
-const balckListedUser = new Mongoose.Schema(
+const blackListedUser = new Mongoose.Schema(
     {
         nickname: {
             type: String,
@@ -13,7 +13,7 @@ const balckListedUser = new Mongoose.Schema(
 
 const RoomBlackListSchema = new Mongoose.Schema({
     room: { type: Schema.Types.ObjectId, ref: 'GameRoom' },
-    users: [balckListedUser],
+    users: [blackListedUser],
 }, { versionKey: false })
 
 module.exports = Mongoose.model('RoomBlackList', RoomBlackListSchema)
