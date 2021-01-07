@@ -315,7 +315,7 @@ class Websockets {
         client.on('kick', async ({ host, nickname }) => {
             try {
                 const room = await GameRoom.findOne({ host: host })
-                const balckList = await RoomBlackList.findOne({ room: room._id })
+                const blackList = await RoomBlackList.findOne({ room: room._id })
                 const user = _.find(room.users, { nickname: nickname })
                 blackList.users.push({ nickname: nickname })
                 await blackList.save()
