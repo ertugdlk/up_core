@@ -166,19 +166,19 @@ class Websockets {
 
                 const blackList = await RoomBlackList.findOne({ room: room._id })
                 const roomUserLimit = parseInt(room.settings.type.charAt(0)) * 2
-                const blackListedUsers = blackList.users
-                for (let i = 0; i < blackListedUsers.length; i++) {
-                    if (data.nickname == blackListedUsers[i].nickname) {
-                        client.emit('Error', 'You are kicked')
-                    }
-                }
+                const checkBlackList = _.find(blackList.users, (user) => {
+                    return data.nickname == user.nickname
+                })
 
-                if (!room || joinedRoom == true || room.users.length == roomUserLimit) {
+                if (!room || joinedRoom == true || room.users.length == roomUserLimit || checkBlackList == undefined) {
                     if (joinedRoom == true) {
                         client.emit('Error', 'exist_joined_room')
                     }
                     else if (room.users.length == roomUserLimit) {
                         client.emit('Error', 'room_is_full')
+                    }
+                    if (checkBlackList == undefined) {
+                        client.emit('Error', 'You are kicked')
                     }
                     else {
                         client.emit('Error', 'room_does_not_exist')
