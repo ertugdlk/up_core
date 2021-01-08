@@ -325,7 +325,7 @@ class Websockets {
                 const user = _.find(room.users, { nickname: nickname })
                 blackList.users.push({ nickname: nickname })
                 await blackList.save()
-                global.io.in(room.roomId).emit('userKicked', ({ nickname: nickname, team: user.team }))
+                global.io.in(room.roomId).emit('userKicked', ({ nickname: nickname, team: user.team, host: host }))
                 //const user = _.find(room.users, { nickname: nickname })//find which user kicked
 
             }
