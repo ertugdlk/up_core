@@ -170,7 +170,7 @@ class Websockets {
                     return data.nickname == user.nickname
                 })
 
-                if (!room || joinedRoom == true || room.users.length == roomUserLimit || checkBlackList == undefined) {
+                if (!room || joinedRoom == true || room.users.length == roomUserLimit || checkBlackList != undefined) {
                     if (joinedRoom == true) {
                         client.emit('Error', 'exist_joined_room')
                     }
