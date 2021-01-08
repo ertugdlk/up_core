@@ -177,7 +177,7 @@ class Websockets {
                     else if (room.users.length == roomUserLimit) {
                         client.emit('Error', 'room_is_full')
                     }
-                    if (checkBlackList == undefined) {
+                    if (checkBlackList != undefined) {
                         client.emit('Error', 'You are kicked')
                     }
                     else {
