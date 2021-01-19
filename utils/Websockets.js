@@ -6,7 +6,6 @@ const RoomBlackList = require('../models/RoomBlackList')
 const moment = require('moment')
 const _ = require('lodash')
 const Game = require('../models/Game')
-const { findOne } = require('../models/GameRoom')
 var clients = []
 //bu array global mi
 

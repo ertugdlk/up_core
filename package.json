@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "jest --detectOpenHandles --silent --runInBand --forceExit"
+    "test": "jest --detectOpenHandles --silent --runInBand --forceExit --testTimeout=50000 -- Socket.test.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +13,7 @@
     "bcrypt": "^5.0.0",
     "config": "^3.3.2",
     "easysoap": "2.2.0",
+    "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",

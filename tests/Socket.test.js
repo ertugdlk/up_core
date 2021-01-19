@@ -1,52 +1,87 @@
-const io = require('socket.io-client')
-const iobackend = require('socket.io')
-const http = require('http')
-const Websockets = require('../utils/Websockets')
 
-let httpServer;
-let httpServerAdr;
-let ioServer;
-let socket;
+var io = require('socket.io-client')
+    , ioOptions = {
+        transports: ['websocket']
+        , forceNew: true
+        , reconnection: false
+    }
+    , testMsg = 'HelloWorld'
+    , sender
+    , receiver
+    , server
 
-describe("Socket.io  Test", () => {
-    beforeAll(async (done) => {
-        httpServer = http.createServer().listen()
-        httpServerAdr = httpServer.address()
-        ioServer = iobackend(httpServer)
-        done()
-    })
+const { http } = require('./socketserver')
+const _ = require("lodash")
+const SocketUserBuilder = require('../models/builders/SocketUserBuilder')
 
-    beforeEach(async (done) => {
-        socket = io('http://' + httpServerAdr.address + ':' + httpServerAdr.port + '/', {
-            transports: ['websocket'],
-        })
+var clients = []
 
-        done();
-    })
+function login(client, nickname) {
+    try {
+        //check data nickname exist or not
+        const user = _.filter(clients, { nickname: nickname })
+        if (!user[0]) {
+            const sockets = [client.id]
+            const newUserBuilder = new SocketUserBuilder()
+                .nickname(nickname)
+                .sockets(sockets)
 
-    it("test", async () => {
-        socket.emit('msg', 'deneme')
-
-        setTimeout(() => {
-            ioServer.on('msg', (data) => {
-                const msg = data
-                expect(msg).toBe('deneme')
-            })
-
-        }, 50)
-    })
-
-    afterEach(async (done) => {
-        if (socket.conneted) {
-            socket.disconnect()
+            const newUser = newUserBuilder.build()
+            clients.push(newUser)
         }
-        done();
+        else {
+            user[0].sockets.push(client.id)
+        }
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+
+describe('Chat Events', () => {
+    beforeAll(async () => {
+        server = http.listen(3000)
     })
 
-    afterAll(async (done) => {
-        ioServer.close()
-        httpServer.close()
+    beforeEach(function (done) {
+
+        // start the io server
+        // connect two io clients
+        sender = io('http://localhost:3000/', ioOptions)
+        receiver = io('http://localhost:3000/', ioOptions)
+
+        // finish beforeEach setup
         done()
+    })
+
+    it('Add new socket to global clients array when new tab oppened on dashboard', function (done) {
+        try {
+            const senderNickname = "ertugdilek"
+
+            sender.emit('login', senderNickname)
+            receiver.on('login', function (nickname) {
+                expect(nickname).toBe(senderNickname)
+                login(sender, nickname)
+                expect(clients.length).toBe(1)
+                done()
+            })
+        }
+        catch (error) {
+            throw error
+        }
+
+    })
+    afterEach(function (done) {
+
+        // disconnect io clients after each test
+        sender.disconnect()
+        receiver.disconnect()
+        done()
+    })
+
+    afterAll(() => {
+        server.close()
     })
 
 })
