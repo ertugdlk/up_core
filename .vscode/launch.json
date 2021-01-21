@@ -13,6 +13,11 @@
             "args": [
                 "--colors",
             ],
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "test"
+            ],
             "env": {
                 "NODE_ENV": "test -- Socket.test.js "
             }

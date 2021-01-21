@@ -1,7 +1,6 @@
 const { sendOtp, verifyOtp } = require('../utils/emailVerification')
 const mongoose = require('mongoose')
 const UserModel = require('../models/User')
-const { findOneAndUpdate, findOne } = require('../models/User')
 
 const userdata = { nickname: 'phybarin', email: 'ertgdlk@gmail.com', password: '123456', isVerified: true, emaiVerified: true }
 describe("Email Change Test", () => {
@@ -25,7 +24,7 @@ describe("Email Change Test", () => {
                 const savedUser = await validUser.save()
                 const update = { email: 'erce124@gmail.com' }
                 await UserModel.findOneAndUpdate({ email: 'erce.test@gmail.com' }, update)
-                const newuser = await findOne({ email: 'erce124@gmail.com' })
+                const newuser = await UserModel.findOne({ email: 'erce124@gmail.com' })
             }
             const newmail = newuser.email
             expect(newmail).toBe('erce124@gmail.com')
