@@ -31,23 +31,28 @@ async function createMatch() {
 async function setupMatch(host) {
     try {
         //Redis Operations
+        /*
         const serverStringArray = redisUtil.getAvaibleServers()
         if (!serverStringArray[0]) {
             throw new Error('No Any Empty Server');
         }
+
         else {
+
             const serverJson = JSON.parse(serverStringArray[0])
             await redisUtil.removeAvaibleServer()
             await redisUtil.addBusyServer(serverStringArray[0])
-            //RCON Connection
-            const rcon = new Rcon({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
-            rcon.connect()
+                        */
+        const serverJson = { host: '176.236.134.7', password: jazz3dtr, port: 27015 }
+        //RCON Connection
+        const rcon = new Rcon({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
+        rcon.connect()
 
-            //RCON request
-            const url = "https://test.unknownpros.com/rcon/matchconfig?host=" + host
-            const response = await Promise.all([rcon.send("get5_endmatch"), rcon.send("get5_loadmatch_url" + ' "' + url + '"')])
-            return response
-        }
+        //RCON request
+        const url = "https://test.unknownpros.com/rcon/matchconfig?host=" + host
+        const response = await Promise.all([rcon.send("get5_endmatch"), rcon.send("get5_loadmatch_url" + ' "' + url + '"')])
+        return response
+
     }
     catch (error) {
         throw error
