@@ -89,14 +89,15 @@ async function matchSettings(host) {
         }
 
         matchconfig.matchid = room.host
-        matchconfig.team1.name = room._id + ':1'
-        matchconfig.team2.name = room._id + ':2'
+        matchconfig.team1.name = room.roomId + ':1'
+        matchconfig.team2.name = room.roomId + ':2'
         matchconfig.team1.players = gameteam1
         matchconfig.team2.players = gameteam2
         matchconfig.maplist = [room.settings.map]
         matchconfig.players_per_team = team1.length
         matchconfig.min_players_to_ready = team1.length * 2
         matchconfig.cvars.hostname = "Unknownpros" + host
+        console.log(matchconfig)
         return matchconfig
     }
     catch (error) {
