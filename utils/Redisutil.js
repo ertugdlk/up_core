@@ -11,6 +11,16 @@ const busy = 'busy_servers'
 const listPush = util.promisify(client.RPUSH)
 const listPop = util.promisify(client.RPOP)
 const listElements = util.promisify(client.LRANGE)
+const setElement = util.promisify(client.SET)
+
+async function setHost(matchid, hostip) {
+    try {
+        await setElement(matchid, hostip)
+    }
+    catch (error) {
+        throw error
+    }
+}
 
 //Avaible Servers 
 async function addAvaibleServer(serverInformation) {
@@ -63,7 +73,7 @@ async function addBusyServer(serverInformation) {
 
 async function removeBusyServer() {
     try {
-        await listPop(busy, serverInformation)
+        await listPop(busy)
     }
     catch (error) {
         throw error
@@ -98,5 +108,6 @@ module.exports = {
     addBusyServer,
     removeBusyServer,
     getBusyServers,
-    getBusyServer
+    getBusyServer,
+    setHost
 }

@@ -58,7 +58,6 @@ async function matchSettings(host) {
 
     try {
         const room = await GameRoom.findOne({ host: host })
-
         const team1 = _.filter(room.users, function (roomUser) {
             return roomUser.team == 1
         })

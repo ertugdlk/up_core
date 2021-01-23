@@ -22,5 +22,4 @@ io.on('connection', function (socket) {
         io.sockets.emit('login', nickname)
     })
 })
-// export the server so it can be easily called for testing
 module.exports = { http }
