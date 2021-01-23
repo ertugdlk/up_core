@@ -43,7 +43,7 @@ async function setupMatch(host) {
             await redisUtil.removeAvaibleServer()
             await redisUtil.addBusyServer(serverStringArray[0])
                         */
-        const serverJson = { host: '176.236.134.7', password: jazz3dtr, port: 27015 }
+        const serverJson = { host: '176.236.134.7', password: "jazz3dtr", port: 27015 }
         //RCON Connection
         const rcon = new Rcon({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
         rcon.connect()
