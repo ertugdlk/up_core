@@ -45,11 +45,10 @@ async function setupMatch(host) {
                         */
         const serverJson = { host: '176.236.134.7', password: "jazz3dtr", port: 27015 }
         //RCON Connection
-        const rcon = new Rcon({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
-        rcon.connect()
+        const rcon = await Rcon.connect({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
 
         //RCON request
-        const url = "https://test.unknownpros.com/rcon/matchconfig?host=" + host
+        const url = "https://test.unknownpros.com:5000/rcon/matchconfig?host=" + host
         const response = await Promise.all([rcon.send("get5_endmatch"), rcon.send("get5_loadmatch_url" + ' "' + url + '"')])
         return response
 
