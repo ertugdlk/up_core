@@ -7,11 +7,6 @@ const BalanceSchema = new Mongoose.Schema({
         type: Number,
         required: true,
         default: 0
-    },
-    vlaue: {
-        type: Number,
-        required: true,
-        default: 0
     }
 }, { versionKey: false })
 

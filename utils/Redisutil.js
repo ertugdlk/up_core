@@ -8,14 +8,24 @@ const client = redis.createClient({
 
 const avaible = 'avaible_servers'
 const busy = 'busy_servers'
-const listPush = util.promisify(client.RPUSH)
-const listPop = util.promisify(client.RPOP)
-const listElements = util.promisify(client.LRANGE)
+client.rpush = util.promisify(client.rpush)
+client.rpop = util.promisify(client.rpop)
+client.lrange = util.promisify(client.lrange)
+client.set = util.promisify(client.set)
+
+async function setRCONinformation(matchid, rconinformation) {
+    try {
+        await client.set(matchid, rconinformation)
+    }
+    catch (error) {
+        throw error
+    }
+}
 
 //Avaible Servers 
 async function addAvaibleServer(serverInformation) {
     try {
-        await listPush(avaible, serverInformation)
+        await client.rpush(avaible, serverInformation)
     }
     catch (error) {
         throw error
@@ -24,7 +34,7 @@ async function addAvaibleServer(serverInformation) {
 
 async function removeAvaibleServer() {
     try {
-        await listPop(avaible)
+        await client.rpop(avaible)
     }
     catch (error) {
         throw error
@@ -33,7 +43,7 @@ async function removeAvaibleServer() {
 
 async function getAvaibleServers() {
     try {
-        const response = await listElements(avaible, 0, -1)
+        const response = await client.lrange(avaible, 0, -1)
         return response
     }
     catch (error) {
@@ -43,7 +53,7 @@ async function getAvaibleServers() {
 
 async function getAvaibleServer() {
     try {
-        const response = await listElements(avaible, -1, -1)
+        const response = await client.lrange(avaible, -1, -1)
         return response
     }
     catch (error) {
@@ -54,7 +64,7 @@ async function getAvaibleServer() {
 //Busy Servers 
 async function addBusyServer(serverInformation) {
     try {
-        await listPush(busy, serverInformation)
+        await client.rpush(busy, serverInformation)
     }
     catch (error) {
         throw error
@@ -63,7 +73,7 @@ async function addBusyServer(serverInformation) {
 
 async function removeBusyServer() {
     try {
-        await listPop(busy, serverInformation)
+        await client.rpop(busy)
     }
     catch (error) {
         throw error
@@ -72,7 +82,7 @@ async function removeBusyServer() {
 
 async function getBusyServers() {
     try {
-        const response = await listElements(busy, 0, -1)
+        const response = await client.lrange(busy, 0, -1)
         return response
     }
     catch (error) {
@@ -82,7 +92,7 @@ async function getBusyServers() {
 
 async function getBusyServer() {
     try {
-        const response = await listElements(busy, -1, -1)
+        const response = await client.lrange(busy, -1, -1)
         return response
     }
     catch (error) {
@@ -98,5 +108,6 @@ module.exports = {
     addBusyServer,
     removeBusyServer,
     getBusyServers,
-    getBusyServer
+    getBusyServer,
+    setRCONinformation,
 }
