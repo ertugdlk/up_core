@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "jest --detectOpenHandles --silent --runInBand --forceExit --testTimeout=50000 -- Socket.test.js"
+    "test": "jest --detectOpenHandles --silent --runInBand --forceExit --testTimeout=50000 -- redisutil.test.js"
   },
   "author": "",
   "license": "ISC",
@@ -31,6 +31,7 @@
   "devDependencies": {
     "@shelf/jest-mongodb": "^1.2.3",
     "axios": "^0.21.1",
-    "jest": "^26.5.3"
+    "jest": "^26.5.3",
+    "redis-mock": "^0.56.3"
   }
 }

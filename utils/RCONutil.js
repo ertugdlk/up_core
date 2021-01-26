@@ -30,27 +30,30 @@ async function createMatch() {
 
 async function setupMatch(host) {
     try {
-        //Redis Operations
-        /*
         const serverStringArray = redisUtil.getAvaibleServers()
         if (!serverStringArray[0]) {
             throw new Error('No Any Empty Server');
         }
 
         else {
-
+            const room = await GameRoom.findOne({ host: host })
+            room.status = 'playing'
+            await room.save()
             const serverJson = JSON.parse(serverStringArray[0])
+
+            //Redis operations to track servers
+            await redisUtil.setRCONinformation(room.roomId, serverStringArray[0])
             await redisUtil.removeAvaibleServer()
             await redisUtil.addBusyServer(serverStringArray[0])
-                        */
-        const serverJson = { host: '176.236.134.7', password: "jazz3dtr", port: 27015 }
-        //RCON Connection
-        const rcon = await Rcon.connect({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
 
-        //RCON request
-        const url = "https://test.unknownpros.com:5000/rcon/matchconfig?host=" + host
-        const response = await Promise.all([rcon.send("get5_endmatch"), rcon.send("get5_loadmatch_url" + ' "' + url + '"')])
-        return response
+            //RCON Connection
+            const rcon = await Rcon.connect({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
+
+            //RCON request to receive match config
+            const url = "https://test.unknownpros.com:5000/rcon/matchconfig?host=" + host
+            const response = await Promise.all([rcon.send("get5_endmatch"), rcon.send("get5_loadmatch_url" + ' "' + url + '"')])
+            return response
+        }
 
     }
     catch (error) {
@@ -62,6 +65,8 @@ async function matchSettings(host) {
 
     try {
         const room = await GameRoom.findOne({ host: host })
+
+        //Matchconfig preparation
         const team1 = _.filter(room.users, function (roomUser) {
             return roomUser.team == 1
         })
