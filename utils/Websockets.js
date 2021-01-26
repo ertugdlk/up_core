@@ -355,6 +355,7 @@ class Websockets {
 
                 if (user.nickname === data.host) {
                     if (roomInfo.userCount === 0) {
+                        await RoomBlackList.findOneAndDelete({ room: room._id })
                         await GameRoom.findByIdAndDelete(room._id)
                         await GameRoomInfo.findByIdAndDelete(roomInfo._id)
                         global.io.local.emit("roomDeleted", ({ host: data.host }))
