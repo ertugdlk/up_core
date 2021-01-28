@@ -52,7 +52,7 @@ async function setupMatch(host) {
             //RCON request to receive match config
             const url = "https://test.unknownpros.com:5000/rcon/matchconfig?host=" + host
             const response = await Promise.all([rcon.send("get5_endmatch"), rcon.send("get5_loadmatch_url" + ' "' + url + '"')])
-            return response
+            return serverJson.host
         }
 
     }
