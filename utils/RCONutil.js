@@ -31,6 +31,7 @@ async function createMatch() {
 async function setupMatch(host) {
     try {
         const serverStringArray = redisUtil.getAvaibleServers()
+        console.log(serverStringArray)
         if (!serverStringArray[0]) {
             throw new Error('No Any Empty Server');
         }
