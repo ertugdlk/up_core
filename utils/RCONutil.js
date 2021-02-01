@@ -30,8 +30,8 @@ async function createMatch() {
 
 async function setupMatch(host) {
     try {
-        const serverStringArray = redisUtil.getAvaibleServers()
-        if (!serverStringArray[0]) {
+        const serverStringArray = await redisUtil.getAvaibleServers()
+        if (serverStringArray.length == 0) {
             throw new Error('No Any Empty Server');
         }
 
@@ -39,12 +39,12 @@ async function setupMatch(host) {
             const room = await GameRoom.findOne({ host: host })
             room.status = 'playing'
             await room.save()
-            const serverJson = JSON.parse(serverStringArray[0])
+            const serverString = await redisUtil.getAvaibleServer()
+            const serverJson = JSON.parse(serverString[0])
 
             //Redis operations to track servers
-            await redisUtil.setRCONinformation(room.roomId, serverStringArray[0])
+            await redisUtil.setRCONinformation(room.roomId, serverString[0])
             await redisUtil.removeAvaibleServer()
-            await redisUtil.addBusyServer(serverStringArray[0])
 
             //RCON Connection
             const rcon = await Rcon.connect({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
@@ -52,7 +52,7 @@ async function setupMatch(host) {
             //RCON request to receive match config
             const url = "https://test.unknownpros.com:5000/rcon/matchconfig?host=" + host
             const response = await Promise.all([rcon.send("get5_endmatch"), rcon.send("get5_loadmatch_url" + ' "' + url + '"')])
-            return response
+            return serverJson.host
         }
 
     }
