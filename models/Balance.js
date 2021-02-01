@@ -10,7 +10,7 @@ const BalanceSchema = new Mongoose.Schema({
     }
 }, { versionKey: false })
 
-module.exports = Mongoose.model('Game', GameSchema)
+module.exports = Mongoose.model('Balance', BalanceSchema)
 
 
 //bool ignNeeded oyunun ign gerektirip gerektirmediği 
