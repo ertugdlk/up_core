@@ -31,8 +31,7 @@ async function createMatch() {
 async function setupMatch(host) {
     try {
         const serverStringArray = await redisUtil.getAvaibleServers()
-        console.log(serverStringArray)
-        if (!serverStringArray[0]) {
+        if (serverStringArray.length == 0) {
             throw new Error('No Any Empty Server');
         }
 
@@ -40,12 +39,12 @@ async function setupMatch(host) {
             const room = await GameRoom.findOne({ host: host })
             room.status = 'playing'
             await room.save()
-            const serverJson = JSON.parse(serverStringArray[0])
+            const serverString = await redisUtil.getAvaibleServer()
+            const serverJson = JSON.parse(serverString[0])
 
             //Redis operations to track servers
-            await redisUtil.setRCONinformation(room.roomId, serverStringArray[0])
+            await redisUtil.setRCONinformation(room.roomId, serverString[0])
             await redisUtil.removeAvaibleServer()
-            await redisUtil.addBusyServer(serverStringArray[0])
 
             //RCON Connection
             const rcon = await Rcon.connect({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
