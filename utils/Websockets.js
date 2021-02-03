@@ -3,6 +3,8 @@ const GameRoom = require('../models/GameRoom')
 const GameRoomInfo = require('../models/GameRoomInfo')
 const ChatHistory = require('../models/ChatHistory')
 const RoomBlackList = require('../models/RoomBlackList')
+const Balance = require('../models/Balance')
+const User = require('../models/User')
 const moment = require('moment')
 const _ = require('lodash')
 const Game = require('../models/Game')
@@ -59,6 +61,18 @@ async function checkJoinedRoom(nickname) {
     }
 }
 
+async function checkBalanceIsEnough(nickname, fee) {
+    const user = await User.findOne({ nickname: nickname })
+    const wallet = await Balance.findOne({ user: user._id })
+
+    if (wallet.balance >= fee) {
+        return true
+    }
+    else {
+        return false
+    }
+}
+
 class Websockets {
 
     connection(client) {
@@ -105,8 +119,15 @@ class Websockets {
                 //check user in any room or not ?
                 const result = await checkHostedRoom(gameData.host)
 
-                if (result == true) {
-                    client.emit('Error', 'exist hoted_room')
+                const isEnoughBalance = checkBalanceIsEnough(gameData.host, gameData.fee)
+
+                if (result == true || isEnoughBalance == false) {
+                    if (result == true) {
+                        client.emit('Error', 'Already have joined or hosted Room')
+                    }
+                    else if (isEnoughBalance == false) {
+                        client.emit('Error', 'Not enough UP to create room')
+                    }
                 }
                 else {
                     let roomUsers = [{ nickname: gameData.host, team: 1, readyStatus: 1 }]
@@ -168,19 +189,24 @@ class Websockets {
                 const checkBlackList = _.find(blackList.users, (user) => {
                     return data.nickname == user.nickname
                 })
+                const fee = room.reward / 2
+                const isEnoughBalance = await checkBalanceIsEnough(data.nickname, fee)
 
-                if (!room || joinedRoom == true || room.users.length == roomUserLimit || checkBlackList != undefined) {
+                if (!room || joinedRoom == true || room.users.length == roomUserLimit || checkBlackList != undefined || isEnoughBalance == false) {
                     if (joinedRoom == true) {
-                        client.emit('Error', 'exist_joined_room')
+                        client.emit('Error', 'Already have joined room')
                     }
                     else if (room.users.length == roomUserLimit) {
-                        client.emit('Error', 'room_is_full')
+                        client.emit('Error', 'Room is full')
                     }
-                    if (checkBlackList != undefined) {
+                    else if (checkBlackList != undefined) {
                         client.emit('Error', 'You are kicked')
                     }
+                    else if (isEnoughBalance == false) {
+                        client.emit('Error', 'Not enough UP to join')
+                    }
                     else {
-                        client.emit('Error', 'room_does_not_exist')
+                        client.emit('Error', 'Error')
                     }
                 }
                 else {
