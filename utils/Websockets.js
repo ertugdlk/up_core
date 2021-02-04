@@ -181,26 +181,22 @@ class Websockets {
         client.on("join", async (data) => {
             try {
 
-                const joinedRoom = await checkJoinedRoom(data.nickname)
+                //const joinedRoom = await checkJoinedRoom(data.nickname)
                 const room = await GameRoom.findOne({ host: data.host })
 
-                const blackList = await RoomBlackList.findOne({ room: room._id })
+                //const blackList = await RoomBlackList.findOne({ room: room._id })
                 const roomUserLimit = parseInt(room.settings.type.charAt(0)) * 2
+                /*
                 const checkBlackList = _.find(blackList.users, (user) => {
                     return data.nickname == user.nickname
                 })
+                */
                 const fee = room.reward / 2
                 const isEnoughBalance = await checkBalanceIsEnough(data.nickname, fee)
 
-                if (!room || joinedRoom == true || room.users.length == roomUserLimit || checkBlackList != undefined || isEnoughBalance == false) {
-                    if (joinedRoom == true) {
-                        client.emit('Error', 'Already have joined room')
-                    }
-                    else if (room.users.length == roomUserLimit) {
+                if (room.users.length == roomUserLimit || isEnoughBalance == false) {
+                    if (room.users.length == roomUserLimit) {
                         client.emit('Error', 'Room is full')
-                    }
-                    else if (checkBlackList != undefined) {
-                        client.emit('Error', 'You are kicked')
                     }
                     else if (isEnoughBalance == false) {
                         client.emit('Error', 'Not enough UP to join')
