@@ -20,7 +20,6 @@ const transporter = nodemailer.createTransport({
     host: "srvm11.trwww.com",
     port: 465,
     secure: true, // true for 465, false for other ports
-
     auth: {
         user: "no-reply@unknownpros.com", // generated ethereal user
         pass: "Sj879h9D", // generated ethereal password
