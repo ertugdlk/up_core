@@ -271,7 +271,11 @@ class Websockets {
 
         client.on('started', async ({ host }) => {
             try {
-                await GameRoom.findOneAndUpdate({ host: host }, { status: 'playing' })
+                const room = await GameRoom.findOneAndUpdate({ host: host }, { status: 'playing' })
+
+                //delete the blacklist when the game is started since the room will be closed after endgame
+                await RoomBlackList.findOneAndDelete({ room: room._id })
+
                 await GameRoomInfo.findByIdAndDelete({ host: host })
                 //Delete room from react room list
                 global.io.local.emit("roomDeleted", ({ host: host }))
@@ -355,6 +359,7 @@ class Websockets {
 
                 if (user.nickname === data.host) {
                     if (roomInfo.userCount === 0) {
+                        await RoomBlackList.findOneAndDelete({ room: room._id })
                         await GameRoom.findByIdAndDelete(room._id)
                         await GameRoomInfo.findByIdAndDelete(roomInfo._id)
                         global.io.local.emit("roomDeleted", ({ host: data.host }))

@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
     secure: true, // true for 465, false for other ports
 
     auth: {
-        user: "no-reply@esportimes.com", // generated ethereal user
+        user: "no-reply@unknownpros.com", // generated ethereal user
         pass: "Sj879h9D", // generated ethereal password
     },
 });
@@ -32,7 +32,7 @@ async function sendOtp(mail) {
         const rand = createRandom()
 
         await transporter.sendMail({
-            from: 'no-reply@esportimes.com',
+            from: 'no-reply@unknownpros.com',
             to: mail,
             subject: "Unknownpros OTP for registration is: ",
             html: "<h3>OTP for account verification is </h3>" + "<h1 style='font-weight:bold;'>" + rand + "</h1>" // html body
