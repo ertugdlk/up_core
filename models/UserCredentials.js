@@ -1,15 +1,15 @@
 const _ = require('lodash')
 const Mongoose = require('mongoose')
 const User = require('./User')
-const Schema   = Mongoose.Schema
+const Schema = Mongoose.Schema
 const bcrypt = require('bcrypt')
-const {encrypt, decrypt} = require('../utils/Cryptoutil')
+const { encrypt, decrypt } = require('../utils/Cryptoutil')
 
 const CredentialsSchema = new Mongoose.Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     identityID: {
-        iv:{type: String,},
-        content:{type: String,}
+        iv: { type: String, },
+        content: { type: String, unique: true }
     },
     phone: {
         type: String,
@@ -33,8 +33,8 @@ const CredentialsSchema = new Mongoose.Schema({
     }
 })
 
-CredentialsSchema.post('save', async function(){
-    await User.findOneAndUpdate({_id : this.user}, {isVerified : true})
+CredentialsSchema.post('save', async function () {
+    await User.findOneAndUpdate({ _id: this.user }, { isVerified: true })
 })
 
 module.exports = Mongoose.model('Credential', CredentialsSchema)

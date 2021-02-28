@@ -46,6 +46,7 @@ async function setupMatch(host) {
             await redisUtil.setRCONinformation(room.roomId, serverString[0])
             await redisUtil.removeAvaibleServer()
 
+
             //RCON Connection
             const rcon = await Rcon.connect({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
 
