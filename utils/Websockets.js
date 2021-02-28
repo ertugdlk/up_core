@@ -322,7 +322,7 @@ class Websockets {
 
         client.on('mapselection', async ({ host, bannedMap, team }) => {
             try {
-                const room = await GameRoom.find({ host: host })
+                const room = await GameRoom.findOne({ host: host })
                 global.io.in(room.roomId).emit("nextTurn", ({ bannedMap, team }))
             }
             catch (error) {
