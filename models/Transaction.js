@@ -40,7 +40,7 @@ const TransactionSchema = new Mongoose.Schema({
 }, { versionKey: false })
 
 
-module.exports = Mongoose.model('Ticket', TicketSchema)
+module.exports = Mongoose.model('Transaction', TransactionSchema)
 /*
 "cc_holder_name":"Taygun Alban",
     "cc_no":"5101521220087763",
