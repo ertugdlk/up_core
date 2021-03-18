@@ -144,7 +144,11 @@ class Websockets {
                     client.emit('roomCreated', savedRoom)
                     client.emit("openedRoom", ({ room: savedRoom, nickname: gameData.host }))
                     //on every create send set new rooms for every socket
-                    global.io.local.emit('newRoom', gameInfo)
+                    var type = "free"
+                    if (gameInfo.fee != 0) {
+                        type = "paid"
+                    }
+                    global.io.local.emit('newRoom', { gameInfo: gameInfo, type: type })
 
                     //create a chatlog for the room that expires in 7 days
                     const chatHistory = new ChatHistory({ room: savedRoom._id, messages: { message: "Game Room Created", nickname: "_DEFAULT_MESSAGE_SENDER" } })
@@ -225,7 +229,12 @@ class Websockets {
                     client.join(room.roomId)
                     client.emit("roomData", (savedRoom))
                     global.io.in(room.roomId).emit("newUserJoined", ({ nickname: data.nickname, team: t, readyStatus: 0 }))
-                    global.io.local.emit("userCountChange", ({ host: data.host, positive: true }))
+
+                    var type = "free"
+                    if (fee != 0) {
+                        type = "paid"
+                    }
+                    global.io.local.emit("userCountChange", ({ host: data.host, positive: true, type: type }))
                     client.emit("openedRoom", ({ room: savedRoom, nickname: data.nickname }))
                 }
             }
@@ -300,7 +309,11 @@ class Websockets {
 
                 await GameRoomInfo.findByIdAndDelete({ host: host })
                 //Delete room from react room list
-                global.io.local.emit("roomDeleted", ({ host: host }))
+                var type = "free"
+                if (room.reward != 0) {
+                    type = "paid"
+                }
+                global.io.local.emit("roomDeleted", ({ host: host, type: type }))
             }
             catch (error) {
                 throw error
@@ -309,7 +322,7 @@ class Websockets {
 
         client.on('mapselection', async ({ host, bannedMap, team }) => {
             try {
-                const room = await GameRoom.find({ host: host })
+                const room = await GameRoom.findOne({ host: host })
                 global.io.in(room.roomId).emit("nextTurn", ({ bannedMap, team }))
             }
             catch (error) {
@@ -350,7 +363,12 @@ class Websockets {
                 const user = _.find(room.users, { nickname: nickname })
                 blackList.users.push({ nickname: nickname })
                 await blackList.save()
-                global.io.in(room.roomId).emit('userKicked', ({ nickname: nickname, team: user.team, host: host }))
+
+                var type = "free"
+                if (room.reward != 0) {
+                    type = "paid"
+                }
+                global.io.in(room.roomId).emit('userKicked', ({ nickname: nickname, team: user.team, host: host, type: type }))
                 //const user = _.find(room.users, { nickname: nickname })//find which user kicked
 
             }
@@ -378,13 +396,17 @@ class Websockets {
                 const roomInfo = await GameRoomInfo.findOne({ host: data.host })
                 roomInfo.userCount -= 1
                 await roomInfo.save()
+                var type = "free"
+                if (roomInfo.fee != 0) {
+                    type = "paid"
+                }
 
                 if (user.nickname === data.host) {
                     if (roomInfo.userCount === 0) {
                         await RoomBlackList.findOneAndDelete({ room: room._id })
                         await GameRoom.findByIdAndDelete(room._id)
                         await GameRoomInfo.findByIdAndDelete(roomInfo._id)
-                        global.io.local.emit("roomDeleted", ({ host: data.host }))
+                        global.io.local.emit("roomDeleted", ({ host: data.host, type: type }))
                     }
                     else {
                         //DB READYCOUNT
@@ -407,9 +429,9 @@ class Websockets {
                         await GameRoom.updateOne({ _id: room._id, 'users.nickname': room.users[1].nickname },
                             { "$set": { "users.$.readyStatus": 1 } })
 
-                        global.io.local.emit("hostChanged", { host: data.host, newHost: room.users[1].nickname })
+                        global.io.local.emit("hostChanged", { host: data.host, newHost: room.users[1].nickname, type: type })
                         global.io.in(room.roomId).emit("HostLeft", ({ host: user, newHost: room.users[1] }))
-                        global.io.local.emit("userCountChange", ({ host: room.users[1].nickname, positive: false }))
+                        global.io.local.emit("userCountChange", ({ host: room.users[1].nickname, positive: false, type: type }))
                     }
                 }
                 else if (user.nickname !== data.host) {
@@ -418,7 +440,7 @@ class Websockets {
                             $pull: { users: { nickname: data.nickname } }//pull user out of the array
                         })
                     global.io.in(room.roomId).emit("UserLeft", (user))
-                    global.io.local.emit("userCountChange", ({ host: data.host, positive: false }))
+                    global.io.local.emit("userCountChange", ({ host: data.host, positive: false, type: type }))
                 }
 
                 client.leave(room.roomId)

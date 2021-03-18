@@ -46,13 +46,17 @@ async function setupMatch(host) {
             await redisUtil.setRCONinformation(room.roomId, serverString[0])
             await redisUtil.removeAvaibleServer()
 
+
             //RCON Connection
             const rcon = await Rcon.connect({ host: serverJson.host, port: serverJson.port, password: serverJson.password })
 
             //RCON request to receive match config
             const url = process.env.BASE_URL + "rcon/matchconfig?host=" + host
             const response = await Promise.all([rcon.send("get5_endmatch"), rcon.send("get5_loadmatch_url" + ' "' + url + '"')])
-            global.io.in(room.roomId).emit("ipInfo", ({ ip: serverJson.host}))
+
+            //socket operation
+            global.io.in(room.roomId).emit("ipInfo", ({ ip: serverJson.host }))
+
             return serverJson.host
         }
 

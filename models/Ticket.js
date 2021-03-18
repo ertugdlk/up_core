@@ -10,7 +10,6 @@ const TicketSchema = new Mongoose.Schema({
     reportType: [String],
     message: { type: String },
     status: { type: String, default: "Waiting" }
-
 }, { versionKey: false })
 
 
