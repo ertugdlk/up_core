@@ -304,13 +304,24 @@ class Websockets {
             try {
                 const room = await GameRoom.findOneAndUpdate({ host: host }, { status: 'playing' })
                 var users = room.users
+
+                user.map(async (user) => {
+                    const user_ = await User.findOne({ nickname: user.nickname })
+                    var balanceOfUser = await Balance.findOne({ user: user_._id })
+                    balanceOfUser.balance -= (room.reward / 2)
+                    balanceOfUser.balanceOnHold += (room.reward / 2)
+                    await balanceOfUser.save()
+                })
+                /*
                 users.forEach(user => {
-                    const user_ = await User.findOne({nickname:user.nickname})
-                    var balanceOfUser = await Balance.findOne({user:user_._id})
-                    balanceOfUser.balance -= (room.reward/2)
-                    balanceOfUser.balanceOnHold += (room.reward/2)
+                    const nickname = 
+                    const user_ = await User.findOne({ nickname: user.nickname })
+                    var balanceOfUser = await Balance.findOne({ user: user_._id })
+                    balanceOfUser.balance -= (room.reward / 2)
+                    balanceOfUser.balanceOnHold += (room.reward / 2)
                     await balanceOfUser.save()
                 });
+                */
                 //delete the blacklist when the game is started since the room will be closed after endgame
                 await RoomBlackList.findOneAndDelete({ room: room._id })
 
