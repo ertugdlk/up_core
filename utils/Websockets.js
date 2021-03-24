@@ -305,7 +305,7 @@ class Websockets {
                 const room = await GameRoom.findOneAndUpdate({ host: host }, { status: 'playing' })
                 var users = room.users
 
-                user.map(async (user) => {
+                users.map(async (user) => {
                     const user_ = await User.findOne({ nickname: user.nickname })
                     var balanceOfUser = await Balance.findOne({ user: user_._id })
                     balanceOfUser.balance -= (room.reward / 2)
